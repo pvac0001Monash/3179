@@ -60,7 +60,12 @@
 					]
 				]
 			},
-			"mark":"circle",
+			"mark":{
+				"type":"circle",
+				"tooltip":{
+					"content":"data"
+				}
+			},
 			"encoding":{
 				"longitude":{
 					"field":"long",
@@ -69,6 +74,10 @@
 				"latitude":{
 					"field":"lat",
 					"type":"quantitative"
+				},
+				"tooltip":{
+					"field":"name",
+					"type":"nominal"
 				},
 				"size":{
 					"value":100
