@@ -96,7 +96,7 @@
 					{
 						"field": "properties.featurenam",
 						"type": "nominal",
-						"title": "CLUE Area"
+						"title": "CLUE Small Area"
 					},
 					{
 						"field": "ChangeInAverageFloors",
