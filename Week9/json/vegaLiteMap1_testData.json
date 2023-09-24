@@ -1,0 +1,132 @@
+{
+	"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	"width": 600,
+	"height": 500,
+	"title": "Melbourne - Change in floor counts - 2002 to 2021",
+	"view": {"fill": "#b6d7e4"},
+	"projection": {
+		"type": "azimuthalEqualArea",
+		"scale": 350000,
+		"center": [0,0],
+		"rotate": [
+			-144.943056,
+			37.814167,
+			0
+		]
+	},
+	"layer": [
+		{
+			"data": {
+				"url": "data/MelbourneWiderArea.json",
+				"format": {
+					"type": "topojson",
+					"feature": "MelbourneWiderArea"
+				}
+			},
+			"mark": {
+				"type": "geoshape",
+				"stroke": "black",
+				"strokeWidth": 0
+			},
+			"encoding": {
+				"color": {
+					"value": "#eeeeee"
+				}
+			}
+		},
+		{
+			"data": {
+				"url": "data/rivers.json",
+				"format": {
+					"type": "topojson",
+					"feature": "waterFromOpenStreetMap"
+				}
+			},
+			"mark": {
+				"type": "geoshape",
+				"stroke": "black",
+				"strokeWidth": 0
+			},
+			"encoding": {
+				"color": {
+					"value": "#b6d7e4"
+				}
+			}
+		},
+		{
+			"data": {
+				"url": "data/small-areas-for-census-of-land-use-and-employment-clue.json",
+				"format": {
+					"type": "topojson",
+					"feature": "small-areas-for-census-of-land-use-and-employment-clue"
+				}
+			},
+			"transform": [
+				{
+					"lookup": "properties.featurenam",
+					"from": {
+						"data": {
+							"url": "data/cleaned.csv",
+							"format": {
+								"type": "csv"
+							}
+						},
+						"key": "CLUESmallArea",
+						"fields": [
+							"ChangeInAverageFloors"
+						]
+					}
+				}
+			],
+			"mark": {
+				"type": "geoshape",
+				"stroke": "#bbb",
+				"strokeWidth": 2
+			},
+			"encoding": {
+				"color": {
+					"field": "ChangeInAverageFloors",
+					"type": "quantitative",
+					"legend": {
+						"format": "p",
+						"title": "Increase in average floor count"
+					}
+				},
+				"tooltip": [
+					{
+						"field": "properties.featurenam",
+						"type": "nominal",
+						"title": "CLUE Area"
+					},
+					{
+						"field": "ChangeInAverageFloors",
+						"type": "quantitative",
+						"format": ".2%",
+						"title": "Increase in average floor count"
+					}
+				]
+			}
+		},
+		{
+			"data": {
+				"graticule": {
+					"extent": [[145.05, -37.75], [144.85, -37.9]],
+					"step": [
+						0.025,
+						0.025
+					]
+				}
+			},
+			"mark": {
+				"type": "geoshape",
+				"stroke": "#c7c7c7",
+				"strokeWidth": 0.5
+			},
+			"encoding": {
+				"color": {
+					"value": "#eee"
+				}
+			}
+		}
+	]
+}
