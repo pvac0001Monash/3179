@@ -1,0 +1,32 @@
+{
+	"map": [
+		"House/Townhouse",
+		"Residential Apartment",
+		"Office",
+		"Entertainment/Recreation - Indoor",
+		"Unoccupied - Unused",
+		"Retail - Shop",
+		"Storage",
+		"Educational/Research",
+		"Commercial Accommodation",
+		"Workshop/Studio",
+		"Equipment Installation",
+		"Unoccupied - Under Construction",
+		"Hospital/Clinic",
+		"Performances, Conferences, Ceremonies",
+		"Manufacturing",
+		"Student Accommodation",
+		"Parking - Commercial Covered",
+		"Unoccupied - Under Renovation",
+		"Wholesale",
+		"Community Use",
+		"Parking - Private Covered",
+		"Retail - Showroom",
+		"Institutional Accommodation",
+		"Public Display Area",
+		"Unoccupied - Under Demolition/Condemned",
+		"Retail - Stall",
+		"Retail - Cars",
+		"Transport"
+	]
+}

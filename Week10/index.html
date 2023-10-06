@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.0"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.17.0"></script>
+
+	<!-- CSS file -->
+	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
+
+
+</head>
+
+<body>
+
+	<div class="container MainTitle" id="MainTitle">City of Melbourne - Change in floor counts - 2002 to 2021</div>
+	<div class="container">
+		<div id="choropleth_map"></div>
+		<div id="barChart1"></div>
+	</div>
+
+	<script type="text/javascript">
+		let barChart;
+		let mapContainer;
+
+		var spec3 = "json/stackedBarChart.json";
+		
+		vegaEmbed('#barChart1', spec3).then(function(result) {
+			barChart = result;
+			let mainView = result.view;
+			let state = mainView.getState();
+
+			mainView.addSignalListener("SelectedUsage", function(name, value){
+
+				let originState = mainView.signal(name);
+
+				let curState = mapContainer.view.signal(name);
+
+				if(originState.type === undefined){
+					mapContainer.view.signal(name, [""]);
+				} else{
+					mapContainer.view.signal(name, originState.type);
+				}
+
+				mapContainer.view.runAsync();
+			});
+		}).catch(console.error);
+
+		var spec2 = "json/vegaLiteMap1_testData.json";
+		vegaEmbed('#choropleth_map', spec2).then(function(result) {
+			mapContainer = result;
+			let mainView = result.view;
+			let state = mainView.getState();
+			mainView.addSignalListener("SelectedCLUEArea", function(name, value){
+
+				let originState = mainView.signal(name);
+
+				let curState = barChart.view.signal(name);
+
+				if(originState.CLUESmallArea === undefined){
+					barChart.view.signal(name, [""]);
+				} else{
+					barChart.view.signal(name,  originState.CLUESmallArea);
+				}
+
+				barChart.view.runAsync();
+			});
+		}).catch(console.error);
+	</script>
+
+</body>
+
+</html>
