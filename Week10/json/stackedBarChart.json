@@ -16,9 +16,13 @@
 			"name": "SelectedUsage",
 			"select": {
 				"type": "point",
-				"fields": [
-					"type"
-				]
+				"fields": ["type"]
+			},
+			"bind": {
+				"input": "select",
+				"options": [null, "Commercial", "Dwelling", "Other", "Transport", "Unoccupied"],
+				"labels":["Show All", "Commercial", "Dwelling", "Other", "Transport", "Unoccupied"],
+				"name": "Usage Selection: "
 			}
 		}
 	],
@@ -88,11 +92,11 @@
 				"title": "Change in avg. floor count"
 			}
 		],
-		"color": {"condition": {"param": "SelectedUsage", "value": "#8ae"}, "value": "#ccc"},
+		"color": {"condition": {"param": "SelectedUsage", "value": "#a8e"}, "value": "#ccc"},
 		"x": {
 			"field": "type",
 			"type": "ordinal",
-			"title": "Usage group"
+			"title": ""
 		},
 		"y": {
 			"field": "ChangeInAverageFloors",

@@ -172,7 +172,7 @@
 						"title": "Increase in average floor count"
 					},
 					"scale": {
-						"scheme": "redyellowgreen",
+						"scheme": "redyellowblue",
 						"domain": [-1, 2.5],
 						"domainMid": 0
 					},
@@ -243,7 +243,35 @@
 				  "type": "csv"
 				}
 			},
-			"mark": { "type": "text", "lineBreak": " ", "stroke": "#FFF", "strokeOpacity": 0.1},
+			"mark": { "type": "text", "lineBreak": " ", "stroke": "#FFF", "strokeWidth": 2, "strokeOpacity": 0.5},
+			"encoding": {
+				"longitude": {
+				  "field": "lon",
+				  "type": "quantitative"
+				},
+				"latitude": {
+				  "field": "lat",
+				  "type": "quantitative"
+				},
+				"text": {
+				  "field": "featurenam",
+				  "type": "nominal"
+				},
+				"size": {
+				  "value": 11
+				},
+				"color": {"value": "#000"}
+			  }
+		},
+		{
+			"data": {
+				"name": "C",
+				"url": "data/centroids.csv",
+				"format": {
+				  "type": "csv"
+				}
+			},
+			"mark": { "type": "text", "lineBreak": " ", "stroke": "#000", "strokeWidth": 0, "strokeOpacity": 1},
 			"encoding": {
 				"longitude": {
 				  "field": "lon",
