@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.0"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.17.0"></script>
+
+	<!-- CSS file -->
+	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
+
+
+</head>
+
+<body>
+
+	<div class="Limits">
+		<div class="container MainTitle" id="MainTitle">
+			<span>City of Melbourne</span>
+			<span id="subLocationTitle" style="font-family: 'Chronicle Display'"></span>
+		</div>
+		<div>
+			<div class="container MapBox">
+				<div class="container" id="subheading">
+					Tallest Building, 2021
+				</div>
+				<div id="choropleth_map2" style="position: absolute;"></div>
+				<div id="choropleth_map" style="position: absolute; visibility: hidden;"></div>
+				<div id="choropleth_map3" style="position: absolute; visibility: hidden;"></div>
+			</div>
+			<div class="Scrolling">
+				<div id="SectionA" class="Section" style="background-color: #e7d6c3;">
+					<div class="SectionBox">
+						<div class="SectionInner">
+							<div class="SectionTitle"> <span>Tallest building (by floors)</span> </div>
+							<div>
+								The tallest building is in <span style="font-weight: bold;">Southbank</span>, but this has not always been the case - previouly, the <span style="font-weight: bold;">CBD</span> had the largest buildings.
+							</div>
+							<div id="BarChartTallest1"></div>
+							<div id="BarChartTallest2"></div>
+							
+							<div class="SectionTitle"> <span>Increase in tallest building</span> </div>
+							<div>
+								... For some usages, there was no noticeable increase ... . For the reigons ..., this is even moreso true.
+							</div>
+							<div id="BarChartTallest3"></div>
+						</div>
+					</div>
+				</div>
+				<div id="SectionB" class="Section">
+					<div class="SectionBox">
+						<div class="SectionInner">
+							<div class="SectionTitle"> <span>Average floor count</span> </div>
+							<div id="ParallelCoord1"></div>
+							<div>
+								For most ..., dwelling have the highest average floor count. ... .... .... .. .. .. . .. 
+							</div>
+							<div id="HistogramScatterPlot2D1"></div>
+						</div>
+					</div>
+				</div>
+				<div id="SectionC" class="Section">
+					<div class="SectionBox">
+						<div class="SectionInner">
+							<div class="SectionTitle"> <span>Percentage Change</span> </div>
+							<div>
+								<span style="font-weight: bold;">Southbank</span> had the largest growth in building height, mostly due to the new construction of skyscrapers
+								in the area over the last two decades, notably the <span style="font-style: italic;">Eureka Tower</span>.
+							</div>
+							<div id="barChart1"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		let visibleMapType = "";
+
+		function isScrolledIntoView(elem) {
+			var docViewTop = $(window).scrollTop();
+			var docViewBottom = docViewTop + $(window).height();
+
+			var elemTop = $(elem).offset().top;
+			var elemBottom = elemTop + $(elem).height();
+
+			return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+		}
+
+		let barChart;
+		let mapContainer;
+
+		let subLocationTitle = document.getElementById("subLocationTitle");
+
+		let SectionA = document.getElementById("SectionA");
+		let SectionB = document.getElementById("SectionB");
+		let SectionC = document.getElementById("SectionC");
+
+		let MapA = document.getElementById("choropleth_map2");
+		let MapB = document.getElementById("choropleth_map3");
+		let MapC = document.getElementById("choropleth_map");
+
+		let Subheading = document.getElementById("subheading");
+
+		SectionA.onclick = function() {
+			SectionA.style.backgroundColor = "#e7d6c3";
+			SectionB.style.backgroundColor = "#f5f5f5";
+			SectionC.style.backgroundColor = "#f5f5f5";
+
+			MapA.style.visibility = "";
+			MapB.style.visibility = "hidden";
+			MapC.style.visibility = "hidden";
+
+			Subheading.innerHTML = "Tallest Building, 2021";
+		};
+
+		SectionB.onclick = function() {
+			SectionA.style.backgroundColor = "#f5f5f5";
+			SectionB.style.backgroundColor = "#e7d6c3";
+			SectionC.style.backgroundColor = "#f5f5f5";
+
+			MapA.style.visibility = "hidden";
+			MapB.style.visibility = "";
+			MapC.style.visibility = "hidden";
+
+			Subheading.innerHTML = "Average floor counts, 2021";
+		};
+
+		SectionC.onclick = function() {
+			SectionA.style.backgroundColor = "#f5f5f5";
+			SectionB.style.backgroundColor = "#f5f5f5";
+			SectionC.style.backgroundColor = "#e7d6c3";
+
+			MapA.style.visibility = "hidden";
+			MapB.style.visibility = "hidden";
+			MapC.style.visibility = "";
+
+			Subheading.innerHTML = "Percentage change in floor counts - 2002 to 2021";
+		};
+
+		var spec3 = "json/stackedBarChart.json";
+
+		vegaEmbed("#barChart1", spec3, {"actions": false}).then(function(result) {
+			barChart = result;
+			let mainView = result.view;
+			let state = mainView.getState();
+
+			mainView.addSignalListener("SelectedUsage", function(name, value) {
+
+				let originState = mainView.signal(name);
+
+				let curState = mapContainer.view.signal(name);
+
+				if(originState.type === undefined) {
+					mapContainer.view.signal(name, [""]);
+				} else {
+					mapContainer.view.signal(name, originState.type);
+				}
+
+				mapContainer.view.runAsync();
+			});
+		}).catch(console.error);
+
+		var spec2 = "json/vegaLiteMap1_testData.json";
+		vegaEmbed("#choropleth_map", spec2, {"actions": false}).then(function(result) {
+			mapContainer = result;
+			let mainView = result.view;
+			let state = mainView.getState();
+			mainView.addSignalListener("SelectedCLUEArea", function(name, value) {
+
+				let originState = mainView.signal(name);
+
+				let curState = barChart.view.signal(name);
+
+				if(originState.CLUESmallArea === undefined) {
+					barChart.view.signal(name, [""]);
+					subLocationTitle.innerHTML = "";
+				} else {
+					barChart.view.signal(name, originState.CLUESmallArea);
+					subLocationTitle.innerHTML = " - " + String(originState.CLUESmallArea);
+				}
+
+				barChart.view.runAsync();
+			});
+		}).catch(console.error);
+
+		var spec22 = "json/vegaLiteMap1_testData2.json";
+		vegaEmbed("#choropleth_map2", spec22, {"actions": false}).then(function(result) {
+			let mainView = result.view;
+			let state = mainView.getState();
+			mainView.addSignalListener("SelectedCLUEArea", function(name, value) {
+				let originState = mainView.signal(name);
+
+				if(originState.CLUESmallArea === undefined) {
+					subLocationTitle.innerHTML = "";
+				} else {
+					subLocationTitle.innerHTML = " - " + String(originState.CLUESmallArea);
+				}
+			});
+		}).catch(console.error);
+
+		var spec23 = "json/vegaLiteMap1_testData3.json";
+		vegaEmbed("#choropleth_map3", spec23, {"actions": false}).then(function(result) {
+			let mainView = result.view;
+			let state = mainView.getState();
+			mainView.addSignalListener("SelectedCLUEArea", function(name, value) {
+				let originState = mainView.signal(name);
+
+				if(originState.CLUESmallArea === undefined) {
+					subLocationTitle.innerHTML = "";
+				} else {
+					subLocationTitle.innerHTML = " - " + String(originState.CLUESmallArea);
+				}
+			});
+		}).catch(console.error);
+
+		var spec4 = "json/histogram1.json";
+		vegaEmbed("#HistogramScatterPlot2D1", spec4, {"actions": false}).then(function(result) {
+		}).catch(console.error);
+
+		var spec5 = "json/parallel1.json";
+		vegaEmbed("#ParallelCoord1", spec5, {"actions": false}).then(function(result) {
+		}).catch(console.error);
+
+		var spec6 = "json/parallel2.json";
+		vegaEmbed("#ParallelCoord2", spec6, {"actions": false}).then(function(result) {
+		}).catch(console.error);
+
+		var spec7 = "json/BarChartTallest1.json";
+		vegaEmbed("#BarChartTallest1", spec7, {"actions": false}).then(function(result) {
+		}).catch(console.error);
+
+		var spec8 = "json/BarChartTallest2.json";
+		vegaEmbed("#BarChartTallest2", spec8, {"actions": false}).then(function(result) {
+		}).catch(console.error);
+
+		var spec9 = "json/BarChartTallest3.json";
+		vegaEmbed("#BarChartTallest3", spec9, {"actions": false}).then(function(result) {
+		}).catch(console.error);
+	</script>
+
+</body>
+
+</html>
