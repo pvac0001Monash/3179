@@ -1,0 +1,96 @@
+{
+	"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	"data": {
+		"url": "cleaned6.csv",
+		"format": {
+			"type": "csv"
+		}
+	},
+	"config":{
+		"font": "VIC"
+	},
+	"title": "Change in floors by usage",
+	"params": [
+		{
+			"name": "SelectedCLUEArea",
+			"value": [""]
+		},
+		{
+			"name": "SelectedUsage",
+			"select": {
+				"type": "point",
+				"fields": ["type"]
+			},
+			"bind": {
+				"input": "select",
+				"options": [null, "Commercial", "Dwelling", "Other", "Transport", "Unoccupied"],
+				"labels":["Show All", "Commercial", "Dwelling", "Other", "Transport", "Unoccupied"],
+				"name": "Usage Selection: "
+			}
+		}
+	],
+	"transform": [
+		{
+			"lookup": "Usage",
+			"from": {
+				"data": {
+					"url": "Space_usage_groupings.json"
+				},
+				"key": "name",
+				"fields": [
+					"type"
+				]
+			}
+		},
+		{
+			"filter": "SelectedCLUEArea[0] == \"\" || indexof(SelectedCLUEArea, datum.CLUESmallArea) != -1"
+		},
+		{
+			"aggregate": [
+				{
+					"op": "max",
+					"field": "MostFloors2002",
+					"as": "MostFloors2002"
+				},
+				{
+					"op": "max",
+					"field": "MostFloors2021",
+					"as": "MostFloors2021"
+				}
+			],
+			"groupby": [
+				"type"
+			]
+		},
+		{
+			"calculate": "datum.MostFloors2021 - datum.MostFloors2002",
+			"as": "ChangeInMax"
+		}
+	],
+	"mark": "bar",
+	"encoding": {
+		"tooltip": [
+			{
+				"field": "type",
+				"type": "nominal",
+				"title": "Usage Group"
+			},
+			{
+				"field": "ChangeInMax",
+				"type": "quantitative",
+				"title": "Change in floor count"
+			}
+		],
+		"color": {"condition": {"param": "SelectedUsage", "value": "#a8e"}, "value": "#ccc"},
+		"x": {
+			"field": "type",
+			"type": "ordinal",
+			"title": ""
+		},
+		"y": {
+			"field": "ChangeInMax",
+			"type": "quantitative",
+			"title": "Change in floor count"
+		}
+	}
+}

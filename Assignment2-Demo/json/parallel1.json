@@ -1,0 +1,58 @@
+{
+	"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	"data": {
+		"url": "cleaned6.csv",
+		"format": {
+			"type": "csv"
+		}
+	},
+	"transform": [
+		{
+			"filter": "datum.FloorCount2021 != 0"
+		},
+		{
+			"lookup": "Usage",
+			"from": {
+				"data": {
+					"url": "Space_usage_groupings.json"
+				},
+				"key": "name",
+				"fields": [
+					"type"
+				]
+			}
+		}
+	],
+	"mark": "line",
+	"width": {
+		"step": 50
+	},
+	"encoding": {
+		"tooltip": [
+			{
+				"aggregate": "average",
+				"field": "MostFloors2021",
+				"type": "quantitative",
+				"title": "Floor count"
+			}
+		],
+		"x": {
+			"field": "type",
+			"type": "nominal",
+			"scale": {
+				"padding": 0.5
+			},
+			"title": "Usage"
+		},
+		"y": {
+			"aggregate": "average",
+			"field": "MostFloors2021",
+			"type": "quantitative",
+			"title": "Floor count"
+		},
+		"color": {
+			"field": "CLUESmallArea",
+			"type": "nominal"
+		}
+	}
+}

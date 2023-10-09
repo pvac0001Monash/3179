@@ -1,0 +1,111 @@
+{
+	"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	"data": {
+		"url": "cleaned5.csv",
+		"format": {
+			"type": "csv"
+		}
+	},
+	"config":{
+		"font": "VIC"
+	},
+	"title": "Average change in floors by usage",
+	"params": [
+		{
+			"name": "SelectedCLUEArea",
+			"value": [""]
+		},
+		{
+			"name": "SelectedUsage",
+			"select": {
+				"type": "point",
+				"fields": ["type"]
+			},
+			"bind": {
+				"input": "select",
+				"options": [null, "Commercial", "Dwelling", "Other", "Transport", "Unoccupied"],
+				"labels":["Show All", "Commercial", "Dwelling", "Other", "Transport", "Unoccupied"],
+				"name": "Usage Selection: "
+			}
+		}
+	],
+	"transform": [
+		{
+			"lookup": "Usage",
+			"from": {
+				"data": {
+					"url": "Space_usage_groupings.json"
+				},
+				"key": "name",
+				"fields": [
+					"type"
+				]
+			}
+		},
+		{
+			"filter": "SelectedCLUEArea[0] == \"\" || indexof(SelectedCLUEArea, datum.CLUESmallArea) != -1"
+		},
+		{
+			"aggregate": [
+				{
+					"op": "sum",
+					"field": "SumFloors2002",
+					"as": "SumFloors2002"
+				},
+				{
+					"op": "sum",
+					"field": "FloorCount2002",
+					"as": "FloorCount2002"
+				},
+				{
+					"op": "sum",
+					"field": "SumFloors2021",
+					"as": "SumFloors2021"
+				},
+				{
+					"op": "sum",
+					"field": "FloorCount2021",
+					"as": "FloorCount2021"
+				}
+			],
+			"groupby": [
+				"type"
+			]
+		},
+		{
+			"calculate": "(datum.FloorCount2021 * datum.SumFloors2002) != 0 || (datum.SumFloors2021 * datum.FloorCount2002) == 0",
+			"as": "HasValidValue"
+		},
+		{
+			"calculate": "!datum.HasValidValue ? 0 : (datum.SumFloors2021 * datum.FloorCount2002) == 0 ? 0 : (datum.SumFloors2021 * datum.FloorCount2002) / (datum.FloorCount2021 * datum.SumFloors2002) - 1", "as": "ChangeInAverageFloors"
+		}
+	],
+	"mark": "bar",
+	"encoding": {
+		"tooltip": [
+			{
+				"field": "type",
+				"type": "nominal",
+				"title": "Usage Group"
+			},
+			{
+				"field": "ChangeInAverageFloors",
+				"type": "quantitative",
+				"format": ".2%",
+				"title": "Change in avg. floor count"
+			}
+		],
+		"color": {"condition": {"param": "SelectedUsage", "value": "#a8e"}, "value": "#ccc"},
+		"x": {
+			"field": "type",
+			"type": "ordinal",
+			"title": ""
+		},
+		"y": {
+			"field": "ChangeInAverageFloors",
+			"type": "quantitative",
+			"title": "Change in average floors",
+			"axis": {"format": ".0%"}
+		}
+	}
+}
