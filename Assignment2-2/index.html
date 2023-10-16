@@ -592,9 +592,9 @@
 		};
 
 		let setmapToTargetTransform = function(view, SelectedArea) {
-			view.signal("LonRotationSignal", transformCurrent.lon);
-			view.signal("LatRotationSignal", transformCurrent.lat);
-			view.signal("ScaleSignal", transformCurrent.zoom);
+			view.signal("LonRotationSignal", transformTarget.lon);
+			view.signal("LatRotationSignal", transformTarget.lat);
+			view.signal("ScaleSignal", transformTarget.zoom);
 			view.signal("SelectedCLUEArea2", [SelectedArea]);
 		};
 
