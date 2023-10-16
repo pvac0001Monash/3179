@@ -125,6 +125,7 @@ body {
 	width: 578px; /* To account for scrollbar */
 	left: 615px;
 	position: relative;
+	background-color: white;
 }
 
 .Limits {
