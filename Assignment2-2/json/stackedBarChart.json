@@ -1,0 +1,161 @@
+{
+	"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	"width": 200,
+	"data": {
+		"url": "cleaned6.csv",
+		"format": {
+			"type": "csv"
+		}
+	},
+	"config": {
+		"font": "VIC",
+		"view": {"stroke": null}
+	},
+	"title": "Change in Average Floors, 2002-2021",
+	"params": [
+		{
+			"name": "SelectedCLUEArea",
+			"value": [
+				""
+			]
+		},
+		{
+			"name": "SelectedUsage",
+			"value": ""
+		}
+	],
+	"transform": [
+		{
+			"lookup": "Usage",
+			"from": {
+				"data": {
+					"url": "Space_usage_groupings.json"
+				},
+				"key": "name",
+				"fields": [
+					"type"
+				]
+			}
+		},
+		{
+			"filter": "SelectedCLUEArea[0] == \"\" || indexof(SelectedCLUEArea, datum.CLUESmallArea) != -1"
+		},
+		{
+			"calculate": "toNumber(datum.SumFloors2002)",
+			"as": "SumFloors2002"
+		},
+		{
+			"calculate": "toNumber(datum.BuildingCount2002)",
+			"as": "BuildingCount2002"
+		},
+		{
+			"calculate": "toNumber(datum.BuildingCount2021)",
+			"as": "BuildingCount2021"
+		},
+		{
+			"calculate": "toNumber(datum.BuildingCount2021)",
+			"as": "BuildingCount2021"
+		},
+		{
+			"aggregate": [
+				{
+					"op": "sum",
+					"field": "SumFloors2002",
+					"as": "SumFloors2002"
+				},
+				{
+					"op": "sum",
+					"field": "BuildingCount2002",
+					"as": "BuildingCount2002"
+				},
+				{
+					"op": "sum",
+					"field": "SumFloors2021",
+					"as": "SumFloors2021"
+				},
+				{
+					"op": "sum",
+					"field": "BuildingCount2021",
+					"as": "BuildingCount2021"
+				}
+			],
+			"groupby": [
+				"type"
+			]
+		},
+		{
+			"calculate": "(datum.BuildingCount2021 * datum.SumFloors2002) != 0 || (datum.SumFloors2021 * datum.BuildingCount2002) == 0",
+			"as": "HasValidValue"
+		},
+		{
+			"calculate": "!datum.HasValidValue ? 0 : (datum.SumFloors2021 * datum.BuildingCount2002) == 0 ? 0 : (datum.SumFloors2021 * datum.BuildingCount2002) / (datum.BuildingCount2021 * datum.SumFloors2002) - 1",
+			"as": "ChangeInAverageFloors"
+		}
+	],
+	"mark": {
+		"type": "bar",
+		"cornerRadiusTopRight": 8
+	},
+	"encoding": {
+		"tooltip": [
+			{
+				"field": "type",
+				"type": "nominal",
+				"title": "Usage Group"
+			},
+			{
+				"field": "ChangeInAverageFloors",
+				"type": "quantitative",
+				"format": ".2%",
+				"title": "Change in avg. floor count"
+			}
+		],
+		"color": {
+			"condition": {
+				"test": "SelectedUsage != \"\" && SelectedUsage != datum.type",
+				"value": "#999"
+			},
+			"field": "type",
+			"scale": {
+				"domain": [
+					"Commercial",
+					"Dwelling",
+					"Other",
+					"Transportation",
+					"Unoccupied"
+				],
+				"range": [
+					"#56b4e9",
+					"#009e73",
+					"#ebc121",
+					"#0072b2",
+					"#cc79a7"
+				]
+			},
+			"title": "Usage"
+		},
+		"x": {
+			"field": "type",
+			"type": "ordinal",
+			"title": "",
+			"axis": {
+				"ticks": false,
+				"labels": false,
+				"domain": false
+			}
+		},
+		"y": {
+			"field": "ChangeInAverageFloors",
+			"type": "quantitative",
+			"title": "Change in average floors",
+			"axis": {
+				"format": ".0%",
+				"domain": false,
+				"gridColor": {
+					"condition": {"test": "datum.value === 0", "value": "black"},
+					"value": "#ddd"
+				}
+			}
+		}
+	}
+}

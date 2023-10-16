@@ -1,0 +1,138 @@
+{
+	"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	"data": {
+		"url": "cleaned6.csv",
+		"format": {
+			"type": "csv"
+		}
+	},
+	"width": 200,
+	"config": {
+		"font": "VIC",
+		"view": {"stroke": null}
+	},
+	"title": "Change in Highest Floor Count, 2002-2021",
+	"params": [
+		{
+			"name": "SelectedCLUEArea",
+			"value": [
+				""
+			]
+		},
+		{
+			"name": "SelectedUsage",
+			"value": ""
+		}
+	],
+	"transform": [
+		{
+			"lookup": "Usage",
+			"from": {
+				"data": {
+					"url": "Space_usage_groupings.json"
+				},
+				"key": "name",
+				"fields": [
+					"type"
+				]
+			}
+		},
+		{
+			"calculate": "toNumber(datum.MostFloors2002)",
+			"as": "MostFloors2002"
+		},
+		{
+			"calculate": "toNumber(datum.MostFloors2021)",
+			"as": "MostFloors2021"
+		},
+		{
+			"filter": "SelectedCLUEArea[0] == \"\" || indexof(SelectedCLUEArea, datum.CLUESmallArea) != -1"
+		},
+		{
+			"aggregate": [
+				{
+					"op": "max",
+					"field": "MostFloors2002",
+					"as": "MostFloors2002"
+				},
+				{
+					"op": "max",
+					"field": "MostFloors2021",
+					"as": "MostFloors2021"
+				}
+			],
+			"groupby": [
+				"type"
+			]
+		},
+		{
+			"calculate": "datum.MostFloors2021 - datum.MostFloors2002",
+			"as": "ChangeInMax"
+		}
+	],
+	"mark": {
+		"type": "bar",
+		"cornerRadiusTopRight": 8
+	},
+	"encoding": {
+		"tooltip": [
+			{
+				"field": "type",
+				"type": "nominal",
+				"title": "Usage"
+			},
+			{
+				"field": "ChangeInMax",
+				"type": "quantitative",
+				"title": "Change in floor count"
+			}
+		],
+		"color": {
+			"condition": {
+				"test": "SelectedUsage != \"\" && SelectedUsage != datum.type",
+				"value": "#999"
+			},
+			"field": "type",
+			"scale": {
+				"domain": [
+					"Commercial",
+					"Dwelling",
+					"Other",
+					"Transportation",
+					"Unoccupied"
+				],
+				"range": [
+					"#56b4e9",
+					"#009e73",
+					"#ebc121",
+					"#0072b2",
+					"#cc79a7"
+				]
+			},
+			"title": "Usage"
+		},
+		"x": {
+			"field": "type",
+			"type": "ordinal",
+			"title": "",
+			"axis": {
+				"ticks": false,
+				"labels": false,
+				"domain": false
+			}
+		},
+		"y": {
+			"field": "ChangeInMax",
+			"type": "quantitative",
+			"axis": {
+				"tickMinStep": 1,
+				"domain": false,
+				"gridColor": {
+					"condition": {"test": "datum.value === 0", "value": "black"},
+					"value": "#ddd"
+				}
+			},
+			"title": "Change in floor count"
+		}
+	}
+}

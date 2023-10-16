@@ -1,0 +1,101 @@
+{
+	"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	"description": "Area chart - proportion versus floor count",
+	"data": {
+		"url": "cleaned6.csv",
+		"format": {
+			"type": "csv"
+		}
+	},
+	"title": "Proportion of Buildings per Usage vs. Average Floors, 2021",
+	"config": {
+		"font": "VIC",
+		"view": {"stroke": null}
+	},
+	"params": [
+		{
+			"name": "SelectedCLUEArea",
+			"value": [""]
+		},
+		{
+			"name": "SelectedUsage",
+			"value": ""
+		}
+	],
+	"transform": [
+		{
+			"filter": "datum.BuildingCount2021 != 0"
+		},
+		{
+			"filter": "SelectedCLUEArea[0] == \"\" || indexof(SelectedCLUEArea, datum.CLUESmallArea) != -1"
+		},
+		{
+			"lookup": "Usage",
+			"from": {
+				"data": {
+					"url": "Space_usage_groupings.json"
+				},
+				"key": "name",
+				"fields": [
+					"type"
+				]
+			}
+		},
+		{
+			"calculate": "round(datum.SumFloors2021 / datum.BuildingCount2021)",
+			"as": "averageFloorCount"
+		}
+	],
+	"width": 200,
+	"height": 200,
+	"mark": {
+		"type": "area",
+		"interpolate": "basis"
+	},
+	"encoding": {
+		"x": {
+			"field": "averageFloorCount",
+			"type": "quantitative",
+			"axis": {"tickMinStep": 1, "domain": false, "grid": false, "ticks": false},
+			"title": "Average Floor Count"
+		},
+		"y": {
+			"aggregate": "sum",
+			"field": "BuildingCount2021",
+			"stack": "normalize",
+			"title": "Proportion of Buildings",
+			"axis": {"format": ".0%", "grid": false}
+		},
+		"color": {
+			"condition": {
+				"test": "SelectedUsage != \"\" && SelectedUsage != datum.type",
+				"value": "#999"
+			},
+			"field": "type",
+			"title": "Usage",
+			"scale": {
+				"domain": [
+					"Commercial",
+					"Dwelling",
+					"Other",
+					"Transportation",
+					"Unoccupied"
+				],
+				"range": [
+					"#56b4e9",
+					"#009e73",
+					"#ebc121",
+					"#0072b2",
+					"#cc79a7"
+				]
+			}
+		},
+		"tooltip": [
+			{
+				"field": "type",
+				"type": "nominal",
+				"title": "Usage"
+			}
+		]
+	}
+}

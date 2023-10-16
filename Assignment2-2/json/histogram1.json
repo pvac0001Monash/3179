@@ -1,0 +1,33 @@
+{
+	"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	"data": {
+		"url": "cleaned6.csv",
+		"format": {
+			"type": "csv"
+		}
+	},
+	"transform": [
+		{
+			"filter": "datum.BuildingCount2021 != 0"
+		},
+		{
+			"calculate": "log(datum.BuildingCount2021)/log(10)",
+			"as": "log_x"
+		}
+	],
+	"mark": "bar",
+	"encoding": {
+		"x": {
+			"bin": true,
+			"field": "BuildingCount2021",
+			"scale": {
+				"type": "sqrt"
+			},
+			"title": "Floor Count"
+		},
+		"y": {
+			"aggregate": "count",
+			"title": "Buildings"
+		}
+	}
+}

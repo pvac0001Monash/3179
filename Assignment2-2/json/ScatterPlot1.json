@@ -1,0 +1,155 @@
+{
+	"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	"description": "TODO: Add this to every plot",
+	"data": {
+		"url": "cleaned6.csv",
+		"format": {
+			"type": "csv"
+		}
+	},
+	"config":{
+		"font": "VIC"
+	},
+	"title": "Average Floor Count vs. Buildings, 2021",
+	"params": [
+		{
+			"name": "SelectedCLUEArea",
+			"value": [""]
+		},
+		{
+			"name": "SelectedUsage",
+			"value": [""]
+		}
+	],
+	"transform": [
+		{
+			"filter": "datum.BuildingCount2021 != 0"
+		},
+		{
+			"lookup": "Usage",
+			"from": {
+				"data": {
+					"url": "Space_usage_groupings.json"
+				},
+				"key": "name",
+				"fields": [
+					"type"
+				]
+			}
+		},
+		{
+			"aggregate": [
+				{
+					"op": "sum",
+					"field": "SumFloors2021",
+					"as": "SumFloors2021"
+				},
+				{
+					"op": "sum",
+					"field": "BuildingCount2021",
+					"as": "BuildingCount2021"
+				}
+			],
+			"groupby": [
+				"CLUESmallArea", "type"
+			]
+		},
+		{
+			"aggregate": [
+				{
+					"op": "count",
+					"field": "type",
+					"as": "typeCount"
+				},
+				{
+					"op": "max",
+					"field": "BuildingCount2021",
+					"as": "CountForThisType"
+				},
+				{
+					"op": "sum",
+					"field": "SumFloors2021",
+					"as": "SumFloors2021"
+				},
+				{
+					"op": "sum",
+					"field": "BuildingCount2021",
+					"as": "BuildingCount2021"
+				},
+				{
+					"op": "argmax",
+					"field": "BuildingCount2021",
+					"as": "argmax_CountForType"
+				}
+			],
+			"groupby": [
+				"CLUESmallArea"
+			]
+		},
+		{
+			"calculate": "datum.SumFloors2021 / datum.BuildingCount2021",
+			"as": "averageFloorCount"
+		}
+	],
+	"mark": "point",
+	"encoding": {
+		"x": {
+			"field": "averageFloorCount",
+			"type": "quantitative",
+			"scale": {
+				"zero": false
+			},
+			"title": "Average floor count"
+		},
+		"y": {
+			"field": "BuildingCount2021",
+			"type": "quantitative",
+			"scale": {
+				"zero": false
+			},
+			"title": "Number of buildings"
+		},
+		"color": {
+			"condition": {
+				"test": "SelectedUsage != \"\" && SelectedUsage != datum.argmax_CountForType['type']",
+				"value": "#999"
+			},
+			"field": "argmax_CountForType['type']",
+			"type": "nominal",
+			"title": "Most common usage",
+			"scale": {
+				"domain": [
+					"Commercial",
+					"Dwelling",
+					"Other",
+					"Transportation",
+					"Unoccupied"
+				],
+				"range": [
+					"#56b4e9",
+					"#009e73",
+					"#ebc121",
+					"#0072b2",
+					"#cc79a7"
+				]
+			}
+		},
+		"tooltip": [
+			{
+				"field": "CLUESmallArea",
+				"type": "nominal",
+				"title": "CLUE Small Area"
+			},
+			{
+				"field": "argmax_CountForType['type']",
+				"type": "nominal",
+				"title": "Most popular usage"
+			},
+			{
+				"field": "typeCount",
+				"type": "ordinal",
+				"title": "Usages present"
+			}
+		]
+	}
+}

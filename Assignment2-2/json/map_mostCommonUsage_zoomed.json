@@ -1,0 +1,359 @@
+{
+	"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	"width": 600,
+	"height": 500,
+	"view": {
+		"fill": "#b6d7e4"
+	},
+	"config":{
+		"font": "VIC"
+	},
+	"params": [
+		{
+			"name": "SelectedUsage",
+			"value": [""]
+		},
+		{
+			"name": "SelectedCLUEArea2",
+			"value": [""]
+		},
+		{
+			"name": "LonRotationSignal",
+			"value": -144.943056
+		},
+		{
+			"name": "LatRotationSignal",
+			"value": 37.814167
+		},
+		{
+			"name": "ScaleSignal",
+			"value": 350000
+		},
+		{
+			"name": "isZoomedInSignal",
+			"value": false
+		}
+	],
+	"projection": {
+		"type": "azimuthalEqualArea",
+		"scale":  {"expr": "ScaleSignal"},
+		"center": [0, 0],
+		"rotate": {"expr": "[LonRotationSignal, LatRotationSignal, 0]"},
+		"extent": [
+			[
+				145.05,
+				-37.75
+			],
+			[
+				144.85,
+				-37.9
+			]
+		],
+		"clipExtent": null,
+		"clipAngle": null
+	},
+	"datasets": {
+		"MainData": {
+				"url": "cleaned6.csv",
+				"format": {
+					"type": "csv"
+				}				
+		},
+		"GeoJsonCLUE": {
+				"url": "data/small-areas-for-census-of-land-use-and-employment-clue.json",
+				"format": {
+				  "type": "topojson",
+				  "feature": "small-areas-for-census-of-land-use-and-employment-clue"
+				}
+		}
+	},
+	"layer": [
+		{
+			"data": {
+				"url": "data/MelbourneWiderArea.json",
+				"format": {
+					"type": "topojson",
+					"feature": "MelbourneWiderArea"
+				}
+			},
+			"mark": {
+				"type": "geoshape",
+				"stroke": "black",
+				"strokeWidth": 0
+			},
+			"encoding": {
+				"color": {
+					"value": "rgb(229, 229, 229)"
+				}
+			}
+		},
+		{
+			"data": {
+				"url": "data/rivers.json",
+				"format": {
+					"type": "topojson",
+					"feature": "waterFromOpenStreetMap"
+				}
+			},
+			"mark": {
+				"type": "geoshape",
+				"stroke": "black",
+				"strokeWidth": 0
+			},
+			"encoding": {
+				"color": {
+					"value": "#b6d7e4"
+				}
+			}
+		},
+		{
+			"params": [
+				{"name": "SelectedCLUEArea", "select": {"type": "point", "fields": ["CLUESmallArea"]}}
+			],
+			"data": {
+				"name": "A",
+				"url": "data/small-areas-for-census-of-land-use-and-employment-clue.json",
+				"format": {
+				  "type": "topojson",
+				  "feature": "small-areas-for-census-of-land-use-and-employment-clue"
+				}
+			},
+			"mark": {
+				"type": "geoshape",
+				"strokeWidth": 2
+			},
+			"encoding": {
+				"color": {
+					"value": "#ddd"
+				},
+				"stroke": {
+					"value": "#bbb"
+				},
+				"tooltip": [
+					{
+						"field": "properties.featurenam",
+						"type": "nominal",
+						"title": "CLUE Area"
+					}
+				]
+			}
+		},
+		{
+			"data": {
+				"name": "XYZA",
+				"url": "data/blocks-for-census-of-land-use-and-employment-clue.json",
+				"format": {
+				  "type": "topojson",
+				  "feature": "blocks-for-census-of-land-use-and-employment-clue"
+				}
+			},
+			"transform": [
+				{
+					"filter": "SelectedCLUEArea2[0] == datum.properties.clue_area"
+				}
+			],
+			"mark": {
+				"type": "geoshape",
+				"strokeWidth": 2
+			},
+			"encoding": {
+				"color": {
+					"value": "#777"
+				},
+				"stroke": {
+					"value": "#bbb"
+				},
+				"tooltip": [
+					{
+						"field": "properties.block_id",
+						"type": "nominal",
+						"title": "Block ID"
+					}
+				]
+			}
+		},
+		{
+			"data": {
+				"url": "cleaned6.csv",
+				"format": {
+					"type": "csv"
+				}				
+			},
+
+			"transform": [
+				{
+					"filter": "SelectedCLUEArea2[0] == datum.CLUESmallArea"
+				},
+				{
+					"filter": "datum.BuildingCount2021 != 0"
+				},
+				{
+					"lookup": "Usage",
+					"from": {
+						"data": {
+							"url": "Space_usage_groupings.json"
+						},
+						"key": "name",
+						"fields": [
+							"type"
+						]
+					}
+				},
+				{
+					"aggregate": [
+						{
+							"op": "sum",
+							"field": "SumFloors2021",
+							"as": "SumFloors2021"
+						},
+						{
+							"op": "sum",
+							"field": "BuildingCount2021",
+							"as": "BuildingCount2021"
+						}
+					],
+					"groupby": [
+						"BlockId", "type"
+					]
+				},
+				{
+					"aggregate": [
+						{
+							"op": "count",
+							"field": "type",
+							"as": "typeCount"
+						},
+						{
+							"op": "max",
+							"field": "BuildingCount2021",
+							"as": "CountForThisType"
+						},
+						{
+							"op": "sum",
+							"field": "SumFloors2021",
+							"as": "SumFloors2021"
+						},
+						{
+							"op": "sum",
+							"field": "BuildingCount2021",
+							"as": "BuildingCount2021"
+						},
+						{
+							"op": "argmax",
+							"field": "BuildingCount2021",
+							"as": "argmax_CountForType"
+						}
+					],
+					"groupby": [
+						"BlockId"
+					]
+				},
+				{
+					"calculate": "datum.SumFloors2021 / datum.BuildingCount2021",
+					"as": "averageFloorCount"
+				},
+				{
+				  "lookup": "BlockId",
+				  "from": {
+					"data": {
+						"name": "XYZ",
+						"url": "data/blocks-for-census-of-land-use-and-employment-clue.json",
+						"format": {
+						  "type": "topojson",
+						  "feature": "blocks-for-census-of-land-use-and-employment-clue"
+						}
+					},
+					"key": "properties.block_id"
+				  },
+				  "as": "geo"
+				}
+			],
+			"mark": {
+				"type": "geoshape",
+				"strokeWidth": 2
+			},
+			"encoding": {
+				"shape": {
+					"field": "geo",
+					"type": "geojson"
+				  },
+				"color": {
+					"condition": {
+						"test": "SelectedUsage != \"\" && SelectedUsage != datum.argmax_CountForType['type']",
+						"value": "#999"
+					},
+					"legend": {
+						"orient": "top-left",
+						"direction": "vertical",
+						"offset": 5
+					},
+					"field": "argmax_CountForType['type']",
+					"type": "nominal",
+					"title": "Usage",
+					"scale": {
+						"domain": [
+							"Commercial",
+							"Dwelling",
+							"Other",
+							"Transportation",
+							"Unoccupied"
+						],
+						"range": [
+							"#56b4e9",
+							"#009e73",
+							"#ebc121",
+							"#0072b2",
+							"#cc79a7"
+						]
+					}
+				},
+				"stroke": {
+					"value": "#bbb"
+				},
+				"order": {"condition": {"param": "SelectedCLUEArea2", "value": 3}, "value": 2},
+				"tooltip": [
+					{
+						"field": "BlockId",
+						"type": "nominal",
+						"title": "CLUE Small Area"
+					},
+					{
+						"field": "argmax_CountForType['type']",
+						"type": "nominal",
+						"title": "Most common usage"
+					}
+				]
+			}
+		},
+		{
+			"data": {
+				"graticule": {
+					"extent": [
+						[
+							145.05,
+							-37.75
+						],
+						[
+							144.85,
+							-37.9
+						]
+					],
+					"step": [
+						0.025,
+						0.025
+					]
+				}
+			},
+			"mark": {
+				"type": "geoshape",
+				"stroke": "#c7c7c7",
+				"strokeWidth": 0.5
+			},
+			"encoding": {
+				"color": {
+					"value": "#eee"
+				}
+			}
+		}
+	]
+}

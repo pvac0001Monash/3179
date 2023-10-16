@@ -1,0 +1,118 @@
+{
+	"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	"description": "Donut chart of sub usages",
+	"width": 200,
+	"height": 150,
+	"data": {
+		"url": "cleaned6.csv",
+		"format": {
+			"type": "csv"
+		}
+	},
+	"config": {
+		"font": "VIC",
+		"style": {
+			"cell": {
+			  "stroke": "transparent"
+			}
+		  }
+	},
+	"params": [
+		{
+			"name": "SelectedUsage",
+			"value": ""
+		},
+		{
+			"name": "SelectedCLUEArea",
+			"value": [
+				""
+			]
+		}
+	],
+	"transform": [
+		{
+			"filter": "datum.BuildingCount2021 != 0"
+		},
+		{
+			"lookup": "Usage",
+			"from": {
+				"data": {
+					"url": "Space_usage_groupings.json"
+				},
+				"key": "name",
+				"fields": [
+					"type"
+				]
+			}
+		},
+		{
+			"filter": "SelectedUsage == \"\" || SelectedUsage == datum.type"
+		},
+		{
+			"filter": "SelectedCLUEArea[0] == \"\" || indexof(SelectedCLUEArea, datum.CLUESmallArea) != -1"
+		},
+		{
+			"aggregate": [
+				{
+					"op": "sum",
+					"field": "BuildingCount2021",
+					"as": "BuildingCount2021"
+				}
+			],
+			"groupby": [
+				"Usage"
+			]
+		},
+		{
+			"joinaggregate": [
+				{
+					"op": "sum",
+					"field": "BuildingCount2021",
+					"as": "TotalBuildingCount2021"
+				}
+			]
+		},
+		{
+			"calculate": "datum.BuildingCount2021/datum.TotalBuildingCount2021",
+			"as": "PercentOfTotal"
+		}
+	],
+	"layer": [
+		{
+			"mark": {
+				"type": "arc",
+				"innerRadius": 50,
+				"outerRadius": 80
+			}
+		}
+	],
+	"encoding": {
+		"theta": {
+			"field": "PercentOfTotal",
+			"type": "quantitative"
+		},
+		"color": {
+			"field": "Usage",
+			"type": "nominal",
+			"title": "Sub-usage"
+		},
+		"tooltip": [
+			{
+				"field": "Usage",
+				"type": "nominal",
+				"title": "Sub-usage"
+			},
+			{
+				"field": "PercentOfTotal",
+				"type": "quantitative",
+				"format": ".2%",
+				"title": "Building percentage"
+			},
+			{
+				"field": "BuildingCount2021",
+				"type": "quantitative",
+				"title": "Building Count"
+			}
+		]
+	}
+}

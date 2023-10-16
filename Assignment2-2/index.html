@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.0"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.17.0"></script>
+
+	<!-- CSS file -->
+	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
+
+	<!-- Symbols -->
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+
+<body>
+
+	<div class="Limits">
+		<div class="container MainTitle" id="MainTitle">
+			<span>City of Melbourne</span>
+			<span id="subLocationTitle" style="font-family: 'Chronicle Display'"></span>
+		</div>
+		<div>
+			<div class="container MapBox">
+				<div class="container", style="background-color: white; padding-top: 10px;">
+					<span style="font-weight: bold; left: 0px", id="subheading">CLUE Small Areas</span>
+				</div>
+				<div id="AllMapsParent" style="overflow-y: clip; position: relative;">
+					<div id="map_default" style="position: absolute;"></div>
+
+					<div id="map_changeInAverageFloorCount_zoomed" style="position: absolute; visibility: hidden;">
+					</div>
+
+					<div id="map_changeInTallest" style="position: absolute; visibility: hidden;"></div>
+					<div id="map_changeInTallest_zoomed" style="position: absolute; visibility: hidden;"></div>
+
+					<div id="map_UsageOfTallest" style="position: absolute; visibility: hidden;"></div>
+					<div id="map_UsageOfTallest_zoomed" style="position: absolute; visibility: hidden;"></div>
+
+					<div id="map_newBuildings" style="position: absolute; visibility: hidden;"></div>
+					<div id="map_newBuildings_zoomed" style="position: absolute; visibility: hidden;"></div>
+
+					<div id="map_tallest" style="position: absolute; visibility: hidden;"></div>
+					<div id="map_tallest_zoomed" style="position: absolute; visibility: hidden;"></div>
+
+					<div id="map_mostCommonUsage" style="position: absolute; visibility: hidden;"></div>
+					<div id="map_mostCommonUsage_zoomed" style="position: absolute; visibility: hidden;"></div>
+
+					<div id="map_averageFloorCount" style="position: absolute; visibility: hidden;"></div>
+					<div id="map_averageFloorCount_zoomed" style="position: absolute; visibility: hidden;"></div>
+
+					<div id="map_buildingCount" style="position: absolute; visibility: hidden;"></div>
+					<div id="map_buildingCount_zoomed" style="position: absolute; visibility: hidden;"></div>
+
+					<div id="map_changeInAverageFloorCount" style="visibility: hidden" ;></div>
+
+
+					<div id="minimap"
+						style="position: absolute; top: 390px; left: 10px; visibility: hidden; z-index: 99 !important;">
+					</div>
+
+					<div id="ZoomOutButton"
+						style="user-select: none; position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 4px; outline: 2px solid; outline-color: #777; visibility: hidden; z-index: 99 !important; background-color: white;">
+						<span class="material-symbols-outlined" style="font-size: 32px;">
+							fullscreen_exit
+						</span>
+					</div>
+				</div>
+				<span style="font-family: 'Chronicle Display'; font-weight: bold; font-size: 12px; padding-left: 8px;">Created by Peter Vacouftsis,
+					28766156. License: CC BY-NC-SA</span>
+			</div>
+			<div class="RightColumn">
+				<div style="height: 10px">
+				</div>
+				<div style="position: relative; right: -180px; width: 300px">
+					<span style="font-weight: bold;">Usage Filter:</span>
+					<select id="UsageChoice" style="font-family: VIC; font-size: 14px;">
+						<option value="Show All" selected>Show All</option>
+						<option value="Commercial">Commercial</option>
+						<option value="Dwelling">Dwelling</option>
+						<option value="Other">Other</option>
+						<option value="Transportation">Transportation</option>
+						<option value="Unoccupied">Unoccupied</option>
+					</select>
+				</div>
+				<div style="height: 6px"></div>
+				<div class="Scrolling"
+					style="outline: 1px solid; border-radius: 4px; outline-color: #ccc; padding: 20px; box-sizing: border-box;">
+
+					<div id="SectionControls" class="Section" style="background-color: #e6e6e6; padding: 20px; border-radius: 4px;">
+						<div class="SubSectionTitle" style="font-family: 'Chronicle Display'; font-weight: bold;"><span>Interactivity</span></div>
+						<div class="LineBreak"></div>
+						<div>
+							<span style="font-family: 'Chronicle Display'; font-weight: bold;">The "Usage" dropdown menu
+								above will affect all
+								charts and the map of this visualisation.
+							</span>
+						</div>
+						<div style="padding-top: 10px;">
+							<span style="font-family: 'Chronicle Display'; font-weight: bold;">Values from the text 
+								<span class="showOnMapButton">that are underlined</span> can
+								be clicked, showing the corresponding data on the map.
+							</span>
+						</div>
+						<div>
+							<span style="font-family: 'Chronicle Display'; font-weight: bold;">On the map, click a region to
+								zoom in, and click
+								the</span>
+							<span class="material-symbols-outlined"
+								style="user-select: none; border-radius: 2px; outline: 1px solid; outline-color: #777; background-color: white;">
+								fullscreen_exit
+							</span>
+							<span style="font-family: 'Chronicle Display'; font-weight: bold;">button in the upper right
+								corner to zoom
+								out.</span>
+						</div>
+					</div>
+
+					<div class="LineBreak"></div>
+					<div class="SectionTitle"><span>Location</span></div>
+					<div class="LineBreak"></div>
+					The <span style="font-weight: bold;">inner city</span> is the heart of Melbourne, <span
+						style="font-weight: bold;">Australia</span>. With a population of close
+					to <span style="font-weight: bold;">150 thousand</span>, the City of Melbourne municipality records
+					information about buildings and
+					their uses, broken down into <span style="font-weight: bold;">13</span> "Census
+					of Land Use and Employment" or <span class="showOnMapButton" id="map_defaultButton">CLUE Small Areas</span>, with these
+					further subdivided into
+					<span style="font-weight: bold;">606 blocks</span>.
+
+
+					<div class="SectionBreak"></div>
+					<div class="SectionTitle"><span>Usage</span></div>
+					<div class="LineBreak"></div>
+					Like any city, different buildings have different purposes, here collected into <span style="font-weight: bold;">5</span> categories, each of
+					which can be broken down into
+					more specific <span style="font-weight: bold;">sub-usage</span> categories.
+					<div class="LineBreak"></div>
+					<div id="donutChartUsageParent" style="overflow-y: clip; max-height:176px; position: relative; right: -20px;">
+						<div id="donutChartUsage_Commercial" style="position: absolute; visibility: hidden;"></div>
+						<div id="donutChartUsage_Dwelling" style="position: absolute; visibility: hidden;"></div>
+						<div id="donutChartUsage_Other" style="position: absolute; visibility: hidden;"></div>
+						<div id="donutChartUsage_Transportation" style="position: absolute; visibility: hidden;"></div>
+						<div id="donutChartUsage_Unoccupied" style="position: absolute; visibility: hidden;"></div>
+						<div id="donutChartUsageDetail"></div>
+					</div>
+					<div class="LineBreak"></div>
+					All CLUE Small Areas have a mix of different usage types, with <span style="font-weight: bold; color: #009e73;">Dwellings</span> being the <span
+						class="showOnMapButton" id="map_mostCommonUsageButton">most common usage type</span> in
+					the city, despite two CLUE Small Areas - <span style="font-weight: bold;">West Melbourne (Industrial)</span> and <span style="font-weight: bold;">Port Melbourne</span> - having no <span style="font-weight: bold; color: #009e73;">Dwellings</span>
+					at all.
+					<div>
+					</div>
+
+					<div class="SectionBreak"></div>
+					<div class="SectionTitle"> <span>Floor count</span> </div>
+					<div class="LineBreak"></div>
+					Along with usage, for each building is collected the number of <span style="font-weight: bold;">usable floors
+					above ground</span>. While not exactly equivelant to the height, this gives a better indication of how the
+					building is from a functional perspective.
+					<div class="SubSectionBreak"></div>
+					<div class="SubSectionTitle"> <span>Tallest (by floors)</span> </div>
+					<div class="LineBreak"></div>
+					<div>
+					This allows us to find the <span class="showOnMapButton" id="map_tallestButton">tallest</span> - at least in terms of floor counts - buildings per
+					region. We can see that the CLUE Small Areas which make up the inner city - <span style="font-weight: bold;">Melbourne (CBD)</span>,
+					<span style="font-weight: bold;">Docklands</span>, and <span style="font-weight: bold;">Southbank</span> - feature the tallest buildings, with the outer regions having
+					generally single-digit maximums.
+					</div>
+					<div class="LineBreak"></div>
+					<div id="BarChartTallest2" style="right: -71px;"></div>
+					<div class="LineBreak"></div>
+					<div>
+					For all CLUE Small Areas that support <span style="font-weight: bold; color: #009e73;">Dwellings</span>, they are the <span class="showOnMapButton" id="map_UsageOfTallestButton">usage of the tallest building</span>, but generally the most common usage in an area is <span style="font-weight: bold;">positively correlated</span> with the usage of the tallest.
+					</div>
+					<div class="SubSectionBreak"></div>
+					<div class="SubSectionTitle"> <span>Building Count</span> </div>
+					<div class="LineBreak"></div>
+					<div id="ScatterPlotParentParent" style="overflow-y: clip; max-height:262px; position: relative;">
+						<div id="scatterPlot1_byBlock" style="position: absolute; visibility: hidden; right: 69px; top: 5px;"></div>
+						<div id="ScatterPlot1" style="right: -62px;"></div>
+					</div>
+					<div class="LineBreak"></div>
+					<div>
+					When the <span class="showOnMapButton" id="map_averageFloorCountButton">average floor count</span> is compared to the <span class="showOnMapButton" id="map_buildingCountButton">number of buildings</span> in each area, there is a bias away from having both tall and numerous buildings. This holds true not only overall, but within most CLUE Small Areas as well.
+					<br/>A notable outlier is <span style="font-weight: bold;">Melbourne (CBD)</span>, which is also predominantly <span style="font-weight: bold; color: #56b4e9;">Commercial</span> in usage.
+					</div>
+					<div class="SubSectionBreak"></div>
+					<div class="SubSectionTitle"> <span>Relation to Usage</span> </div>
+					<div class="LineBreak"></div>
+					<div id="AreaChart1" style="right: -28px;"></div>
+					<div class="LineBreak"></div>
+					With <span style="font-weight: bold; color: #009e73;">Dwellings</span> dominating the proportion of taller buildings in all CLUE Small Areas except <span style="font-weight: bold;">Parkville</span>.<br/>
+					In <span style="font-weight: bold;">Carlton</span>, <span style="font-weight: bold;">Parkville</span>, and <span style="font-weight: bold;">Kensignton</span>, the proportion of <span style="font-weight: bold; color: #cc79a7;">Unoccupied</span> buildings trends upward with the floor count.
+
+
+					<div class="SectionBreak"></div>
+					<div class="SectionTitle"> <span>Since 2002...</span> </div>
+					<div class="LineBreak"></div>
+					Much has changed about the city over the last two decades, with the rejuvination and development of areas just outside the CBD - <span style="font-weight: bold;">Docklands</span> and <span style="font-weight: bold;">Southbank</span>.
+
+					<div class="SubSectionBreak"></div>
+					<div class="SubSectionTitle"> <span>Tallest (by floors)</span> </div>
+					<div class="LineBreak"></div>
+					<div>
+					Across the city, the <span class="showOnMapButton" id="map_changeInTallestButton">tallest building</span> in each region is now taller than that of 2002.
+					<br/> The tallest building is in <span style="font-weight: bold;">Southbank</span>, but this
+					has not always been the case; previously, the <span style="font-weight: bold;">Melbourne (CBD)</span>
+					had the tallest buildings.
+					</div>
+					<div class="LineBreak"></div>
+					<div id="BarChartTallest3" style="right: -75px;"></div>
+					<div class="LineBreak"></div>
+					<div>
+						By usage, only the tallest <span style="font-weight: bold; color: #009e73;">Dwelling</span> (again due to the new construction
+						in
+						the <span style="font-weight: bold;">Southbank</span>) and <span style="font-weight: bold; color: #cc79a7;">Unoccupied</span> (from <span style="font-weight: bold;">Melbourne (CBD)</span>) significantly increased in height.<br />
+						Looking per CLUE Small Area, all experienced some change, including some areas having their tallest
+						building be
+						shorter than it was in 2002, such as for the <span style="font-weight: bold; color: #0072b2;">Transportation</span> usage in <span style="font-weight: bold;">South Yarra</span>.
+					</div>
+
+					<div class="SubSectionBreak"></div>
+					<div class="SubSectionTitle"> <span>Building Count</span> </div>
+					<div class="LineBreak"></div>
+					<div>
+						For the total <span class="showOnMapButton" id="map_newBuildingsButton">increase in the number of buildings</span>, majourly driven by new construction, Dwelings saw the greatest increase, whilst <span style="font-weight: bold; color: #56b4e9;">Commercial</span> buildings were the only to decrease.
+					</div>
+					<div class="LineBreak"></div>
+					<div id="barChartNewBuildings" style="right: -60px;"></div>
+					<div class="LineBreak"></div>
+					<div>
+						While <span style="font-weight: bold; color: #0072b2;">Transportation</span> related buildings appear the same overall, their numbers did vary per CLUE Small Area.
+					</div>
+
+					<div class="SubSectionBreak"></div>
+					<div class="SubSectionTitle"> <span>Floor counts</span> </div>
+					<div class="LineBreak"></div>
+					<div>
+						<div>
+							When viewing the <span class="showOnMapButton" id="map_changeInAverageFloorCountButton">change in average floor counts</span> since 2002, <span style="font-weight: bold;">Southbank</span> had the largest growth in floor
+							counts, mostly due to the new construction of skyscrapers
+							in the area over the last two decades, notably the <span style="font-weight: bold;">Eureka
+								Tower</span>.
+						</div>
+					</div>
+					<div class="LineBreak"></div>
+					<div id="barChart1" style="right: -66px;"></div>
+					<div class="LineBreak"></div>
+					<div>
+					Unlike the rest of the city, the <span style="font-weight: bold;">Docklands</span> saw a reduction in the floor counts of <span style="font-weight: bold; color: #009e73;">Dwellings</span>.
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		let visibleMapType = "";
+		let activeMap;
+		let unZoomedMap;
+		let zoomedMap;
+		let unZoomedMapElement;
+		let zoomedMapElement;
+		let SelectedCLUEArea;
+
+		function isScrolledIntoView(elem) {
+			var docViewTop = $(window).scrollTop();
+			var docViewBottom = docViewTop + $(window).height();
+
+			var elemTop = $(elem).offset().top;
+			var elemBottom = elemTop + $(elem).height();
+
+			return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+		}
+
+		let barChart;
+		let areaChart;
+		let scatterPlot;
+		let scatterPlot1_byBlock;
+
+		let scatterPlotDoc = document.getElementById("ScatterPlot1");
+		let scatterPlot1_byBlockDoc = document.getElementById("scatterPlot1_byBlock");
+
+		let donutChartUsageDetail;
+		let donutChartUsage_Commercial;
+		let donutChartUsage_Dwelling;
+		let donutChartUsage_Other;
+		let donutChartUsage_Transportation;
+		let donutChartUsage_Unoccupied;
+		let BarChartTallest3;
+		let barChartNewBuildings;
+		let BarChartTallest2;
+
+		let subLocationTitle = document.getElementById("subLocationTitle");
+
+		//Maps
+		let map_default = document.getElementById("map_default");
+		let map_defaultContainer;
+
+		let map_changeInAverageFloorCount = document.getElementById("map_changeInAverageFloorCount");
+		let map_changeInAverageFloorCountContainer;
+		let map_changeInAverageFloorCount_zoomed = document.getElementById("map_changeInAverageFloorCount_zoomed");
+		let map_changeInAverageFloorCountContainer_zoomed;
+
+		let map_UsageOfTallest = document.getElementById("map_UsageOfTallest");
+		let map_UsageOfTallestContainer;
+		let map_UsageOfTallest_zoomed = document.getElementById("map_UsageOfTallest_zoomed");
+		let map_UsageOfTallestContainer_zoomed;
+
+		let map_changeInTallest = document.getElementById("map_changeInTallest");
+		let map_changeInTallestContainer;
+		let map_changeInTallest_zoomed = document.getElementById("map_changeInTallest_zoomed");
+		let map_changeInTallestContainer_zoomed;
+
+		let map_newBuildings = document.getElementById("map_newBuildings");
+		let map_newBuildingsContainer;
+		let map_newBuildings_zoomed = document.getElementById("map_newBuildings_zoomed");
+		let map_newBuildingsContainer_zoomed;
+
+		let map_tallest = document.getElementById("map_tallest");
+		let map_tallestContainer;
+		let map_tallest_zoomed = document.getElementById("map_tallest_zoomed");
+		let map_tallestContainer_zoomed;
+
+		let map_mostCommonUsage = document.getElementById("map_mostCommonUsage");
+		let map_mostCommonUsageContainer;
+		let map_mostCommonUsage_zoomed = document.getElementById("map_mostCommonUsage_zoomed");
+		let map_mostCommonUsageContainer_zoomed;
+
+		let map_averageFloorCount = document.getElementById("map_averageFloorCount");
+		let map_averageFloorCountContainer;
+		let map_averageFloorCount_zoomed = document.getElementById("map_averageFloorCount_zoomed");
+		let map_averageFloorCountContainer_zoomed;
+
+		let map_buildingCount = document.getElementById("map_buildingCount");
+		let map_buildingCountContainer;
+		let map_buildingCount_zoomed = document.getElementById("map_buildingCount_zoomed");
+		let map_buildingCountContainer_zoomed;
+		//End maps
+
+		
+		let setMapCursorEvents = function(value) {
+			map_default.style.pointerEvents = value;
+			map_changeInAverageFloorCount.style.pointerEvents = value;
+			map_UsageOfTallest.style.pointerEvents = value;
+			map_changeInTallest.style.pointerEvents = value;
+			map_newBuildings.style.pointerEvents = value;
+			map_tallest.style.pointerEvents = value;
+			map_mostCommonUsage.style.pointerEvents = value;
+			map_averageFloorCount.style.pointerEvents = value;
+			map_buildingCount.style.pointerEvents = value;
+			map_changeInAverageFloorCount_zoomed.style.pointerEvents = value;
+			map_UsageOfTallest_zoomed.style.pointerEvents = value;
+			map_changeInTallest_zoomed.style.pointerEvents = value;
+			map_newBuildings_zoomed.style.pointerEvents = value;
+			map_tallest_zoomed.style.pointerEvents = value;
+			map_mostCommonUsage_zoomed.style.pointerEvents = value;
+			map_averageFloorCount_zoomed.style.pointerEvents = value;
+			map_buildingCount_zoomed.style.pointerEvents = value;
+		};
+
+
+		let chartsReadyCount = 0;
+
+		let setOtherInteractablesInputEvents = function(value){
+			document.getElementById("map_defaultButton").style.pointerEvents = value;
+			document.getElementById("map_changeInAverageFloorCountButton").style.pointerEvents = value;
+			document.getElementById("map_UsageOfTallestButton").style.pointerEvents = value;
+			document.getElementById("map_mostCommonUsageButton").style.pointerEvents = value;
+			document.getElementById("map_buildingCountButton").style.pointerEvents = value;
+			document.getElementById("map_newBuildingsButton").style.pointerEvents = value;
+			document.getElementById("map_changeInTallestButton").style.pointerEvents = value;
+			document.getElementById("map_tallestButton").style.pointerEvents = value;
+			document.getElementById("map_averageFloorCountButton").style.pointerEvents = value;
+			document.getElementById("UsageChoice").style.pointerEvents = value;
+		};
+
+		setMapCursorEvents("none");
+		setOtherInteractablesInputEvents("none");
+		let checkAllChartsReady = function(){
+			if(chartsReadyCount == 31){
+				setMapCursorEvents("all");
+				setOtherInteractablesInputEvents("all");
+			}
+		};
+
+		vegaEmbed("#ScatterPlot1", "json/ScatterPlot1.json", {"actions": false}).then(function(result) {
+			scatterPlot = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#scatterPlot1_byBlock", "json/scatterPlot1_byBlock.json", {"actions": false}).then(function(result) {
+			scatterPlot1_byBlock = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		let ZoomOutButton = document.getElementById("ZoomOutButton");
+		let minimap = document.getElementById("minimap");
+
+		let Subheading = document.getElementById("subheading");
+
+		let hideAllMaps = function(value) {
+			map_default.style.visibility = "hidden";
+			map_changeInAverageFloorCount.style.visibility = "hidden";
+			map_UsageOfTallest.style.visibility = "hidden";
+			map_changeInTallest.style.visibility = "hidden";
+			map_newBuildings.style.visibility = "hidden";
+			map_tallest.style.visibility = "hidden";
+			map_mostCommonUsage.style.visibility = "hidden";
+			map_averageFloorCount.style.visibility = "hidden";
+			map_buildingCount.style.visibility = "hidden";
+			map_changeInAverageFloorCount_zoomed.style.visibility = "hidden";
+			map_UsageOfTallest_zoomed.style.visibility = "hidden";
+			map_changeInTallest_zoomed.style.visibility = "hidden";
+			map_newBuildings_zoomed.style.visibility = "hidden";
+			map_tallest_zoomed.style.visibility = "hidden";
+			map_mostCommonUsage_zoomed.style.visibility = "hidden";
+			map_averageFloorCount_zoomed.style.visibility = "hidden";
+			map_buildingCount_zoomed.style.visibility = "hidden";
+		};
+
+		document.getElementById("map_defaultButton").onclick = function() {
+			zoomedMap = map_changeInAverageFloorCountContainer_zoomed;
+			unZoomedMap = map_defaultContainer;
+			activeMap = !isZoomedIn ? zoomedMap : unZoomedMap;
+			zoomedMapElement = map_default;
+			unZoomedMapElement = map_changeInAverageFloorCount_zoomed;
+			activeElement = !isZoomedIn ? zoomedMapElement : unZoomedMapElement;
+
+			hideAllMaps();
+			activeElement.style.visibility = "";
+
+			Subheading.innerHTML = "CLUE Small Areas";
+
+			zoomedMap.view.run();
+			unZoomedMap.view.run();
+
+			if(isZoomedIn) {
+				forceZoomOut();
+			}
+		};
+
+		document.getElementById("map_changeInAverageFloorCountButton").onclick = function() {
+			zoomedMap = map_changeInAverageFloorCountContainer_zoomed;
+			unZoomedMap = map_changeInAverageFloorCountContainer;
+			activeMap = !isZoomedIn ? zoomedMap : unZoomedMap;
+			zoomedMapElement = map_changeInAverageFloorCount;
+			unZoomedMapElement = map_changeInAverageFloorCount_zoomed;
+			activeElement = !isZoomedIn ? zoomedMapElement : unZoomedMapElement;
+
+			hideAllMaps();
+			activeElement.style.visibility = "";
+
+			Subheading.innerHTML = "Change in Average Floor Count, 2002-2021";
+
+			zoomedMap.view.run();
+			unZoomedMap.view.run();
+		};
+
+		document.getElementById("map_UsageOfTallestButton").onclick = function() {
+			zoomedMap = map_UsageOfTallestContainer_zoomed;
+			unZoomedMap = map_UsageOfTallestContainer;
+			activeMap = !isZoomedIn ? zoomedMap : unZoomedMap;
+			zoomedMapElement = map_UsageOfTallest;
+			unZoomedMapElement = map_UsageOfTallest_zoomed;
+			activeElement = !isZoomedIn ? zoomedMapElement : unZoomedMapElement;
+
+			hideAllMaps();
+			activeElement.style.visibility = "";
+
+			Subheading.innerHTML = "Change in Average Floor Count, 2002-2021";
+
+			zoomedMap.view.run();
+			unZoomedMap.view.run();
+		};
+
+		document.getElementById("map_mostCommonUsageButton").onclick = function() {
+			zoomedMap = map_mostCommonUsageContainer_zoomed;
+			unZoomedMap = map_mostCommonUsageContainer;
+			activeMap = !isZoomedIn ? zoomedMap : unZoomedMap;
+			zoomedMapElement = document.getElementById("map_mostCommonUsage");
+			unZoomedMapElement = document.getElementById("map_mostCommonUsage_zoomed");
+			activeElement = !isZoomedIn ? zoomedMapElement : unZoomedMapElement;
+
+			hideAllMaps();
+			activeElement.style.visibility = "";
+
+			Subheading.innerHTML = "Most Common Usage, 2021";
+
+			zoomedMap.view.run();
+			unZoomedMap.view.run();
+		};
+
+		document.getElementById("map_buildingCountButton").onclick = function() {
+			zoomedMap = map_buildingCountContainer_zoomed;
+			unZoomedMap = map_buildingCountContainer;
+			activeMap = !isZoomedIn ? zoomedMap : unZoomedMap;
+			zoomedMapElement = document.getElementById("map_buildingCount");
+			unZoomedMapElement = document.getElementById("map_buildingCount_zoomed");
+			activeElement = !isZoomedIn ? zoomedMapElement : unZoomedMapElement;
+
+			hideAllMaps();
+			activeElement.style.visibility = "";
+
+			Subheading.innerHTML = "Building Count, 2021";
+
+			zoomedMap.view.run();
+			unZoomedMap.view.run();
+		};
+
+		document.getElementById("map_newBuildingsButton").onclick = function() {
+			zoomedMap = map_newBuildingsContainer_zoomed;
+			unZoomedMap = map_newBuildingsContainer;
+			activeMap = !isZoomedIn ? zoomedMap : unZoomedMap;
+			zoomedMapElement = document.getElementById("map_newBuildings");
+			unZoomedMapElement = document.getElementById("map_newBuildings_zoomed");
+			activeElement = !isZoomedIn ? zoomedMapElement : unZoomedMapElement;
+
+			hideAllMaps();
+			activeElement.style.visibility = "";
+
+			Subheading.innerHTML = "Change in Building Count, 2002-2021";
+
+			zoomedMap.view.run();
+			unZoomedMap.view.run();
+		};
+
+		document.getElementById("map_changeInTallestButton").onclick = function() {
+			zoomedMap = map_changeInTallestContainer_zoomed;
+			unZoomedMap = map_changeInTallestContainer;
+			activeMap = !isZoomedIn ? zoomedMap : unZoomedMap;
+			zoomedMapElement = document.getElementById("map_changeInTallest");
+			unZoomedMapElement = document.getElementById("map_changeInTallest_zoomed");
+			activeElement = !isZoomedIn ? zoomedMapElement : unZoomedMapElement;
+
+			hideAllMaps();
+			activeElement.style.visibility = "";
+
+			Subheading.innerHTML = "Change in Tallest Floor Count, 2002-2021";
+
+			zoomedMap.view.run();
+			unZoomedMap.view.run();
+		};
+
+		document.getElementById("map_tallestButton").onclick = function() {
+			zoomedMap = map_tallestContainer_zoomed;
+			unZoomedMap = map_tallestContainer;
+			activeMap = !isZoomedIn ? zoomedMap : unZoomedMap;
+			zoomedMapElement = document.getElementById("map_tallest");
+			unZoomedMapElement = document.getElementById("map_tallest_zoomed");
+			activeElement = !isZoomedIn ? zoomedMapElement : unZoomedMapElement;
+
+			hideAllMaps();
+			activeElement.style.visibility = "";
+
+			Subheading.innerHTML = "Tallest Building, 2021";
+
+			zoomedMap.view.run();
+			unZoomedMap.view.run();
+		};
+
+		document.getElementById("map_averageFloorCountButton").onclick = function() {
+			zoomedMap = map_averageFloorCountContainer_zoomed;
+			unZoomedMap = map_averageFloorCountContainer;
+			activeMap = !isZoomedIn ? zoomedMap : unZoomedMap;
+			zoomedMapElement = document.getElementById("map_averageFloorCount");
+			unZoomedMapElement = document.getElementById("map_averageFloorCount_zoomed");
+			activeElement = !isZoomedIn ? zoomedMapElement : unZoomedMapElement;
+
+			hideAllMaps();
+			activeElement.style.visibility = "";
+
+			Subheading.innerHTML = "Average Floor Count, 2021";
+
+			zoomedMap.view.run();
+			unZoomedMap.view.run();
+		};
+
+		let isZoomedIn = false;
+		let updateAllMaps = function() {
+			if(isZoomedIn) {
+				ZoomOutButton.style.visibility = null;
+				minimap.style.visibility = null;
+			} else {
+				ZoomOutButton.style.visibility = "hidden";
+				minimap.style.visibility = "hidden";
+			}
+
+		};
+
+		let setmapToTargetTransform = function(view, SelectedArea) {
+			view.signal("LonRotationSignal", transformTarget.lon);
+			view.signal("LatRotationSignal", transformTarget.lat);
+			view.signal("ScaleSignal", transformTarget.zoom);
+			view.signal("SelectedCLUEArea2", [SelectedArea]);
+		};
+
+		let setAllZoomedMapsToFinalLocation = function(SelectedArea) {
+			setmapToTargetTransform(map_changeInTallestContainer_zoomed.view, SelectedArea);
+			setmapToTargetTransform(map_newBuildingsContainer_zoomed.view, SelectedArea);
+			setmapToTargetTransform(map_tallestContainer_zoomed.view, SelectedArea);
+			setmapToTargetTransform(map_mostCommonUsageContainer_zoomed.view, SelectedArea);
+			setmapToTargetTransform(map_averageFloorCountContainer_zoomed.view, SelectedArea);
+			setmapToTargetTransform(map_changeInAverageFloorCountContainer_zoomed.view, SelectedArea);
+			setmapToTargetTransform(map_UsageOfTallestContainer_zoomed.view, SelectedArea);
+			setmapToTargetTransform(map_buildingCountContainer_zoomed.view, SelectedArea);
+		};
+
+		let recursiveAnimation = async function(mainView) {
+			let dif = (Date.now() - transTime) / animationTime;
+			await delay(0);
+
+			if(dif > 1) {
+				dif = 1;
+			}
+
+			let isZoomingOut = transformTarget.zoom < transformCurrent.zoom;
+
+			let quadEase = isZoomingOut ? dif * dif : 1 - (1 - dif) * (1 - dif);
+
+			mainView.signal("LonRotationSignal", transformTarget.lon * quadEase + (1 - quadEase) * transformCurrent.lon);
+			mainView.signal("LatRotationSignal", transformTarget.lat * quadEase + (1 - quadEase) * transformCurrent.lat);
+			mainView.signal("ScaleSignal", transformTarget.zoom * dif + (1 - dif) * transformCurrent.zoom);
+			await mainView.runAsync();
+			if(dif < 1) {
+				mainView.runAfter(recursiveAnimation);
+			} else {
+				setMapCursorEvents("all");
+			}
+		};
+
+		let doZoomOut = function(mainViewContainer, mainView, prevView, name) {
+			activeMap = mainViewContainer;
+
+			barChart.view.signal(name, [""]);
+			scatterPlot.view.signal(name, [""]);
+			scatterPlot1_byBlock.view.signal(name, [""]);
+			areaChart.view.signal(name, [""]);
+			donutChartUsageDetail.view.signal(name, [""]);
+			donutChartUsage_Commercial.view.signal(name, [""]);
+			donutChartUsage_Dwelling.view.signal(name, [""]);
+			donutChartUsage_Other.view.signal(name, [""]);
+			donutChartUsage_Transportation.view.signal(name, [""]);
+			donutChartUsage_Unoccupied.view.signal(name, [""]);
+			BarChartTallest3.view.signal(name, [""]);
+			barChartNewBuildings.view.signal(name, [""]);
+			BarChartTallest2.view.signal(name, [""]);
+
+			mainView.signal("SelectedCLUEArea2", [""]);
+			mainView.signal("isZoomedInSignal", false);
+
+			isZoomedIn = false;
+
+			subLocationTitle.innerHTML = "";
+
+			scatterPlotDoc.style.visibility = "";
+			scatterPlot1_byBlockDoc.style.visibility = "hidden";
+
+			transformCurrent.lat = prevView.signal("LatRotationSignal");
+			transformCurrent.lon = prevView.signal("LonRotationSignal");
+			transformCurrent.zoom = prevView.signal("ScaleSignal");
+
+			mainView.signal("LonRotationSignal", transformCurrent.lon);
+			mainView.signal("LatRotationSignal", transformCurrent.lat);
+			mainView.signal("ScaleSignal", transformCurrent.zoom);
+
+			mainView.runAsync();
+
+			setMapCursorEvents("none");
+
+			mainView.runAfter(
+				function(mainView) {
+					transformTarget.lat = 37.814167;
+					transformTarget.lon = -144.943056;
+					transformTarget.zoom = 350000;
+					transTime = Date.now();
+
+					mainView.runAsync();
+					mainView.runAfter(recursiveAnimation);
+				}
+			);
+		};
+
+		let doZoomIn = function(mainViewContainer, mainView, prevView, name, CLUESmallAreaValue) {
+			activeMap = mainViewContainer;
+
+			barChart.view.signal(name, [CLUESmallAreaValue]);
+			scatterPlot.view.signal(name, [CLUESmallAreaValue]);
+			scatterPlot1_byBlock.view.signal(name, [CLUESmallAreaValue]);
+			areaChart.view.signal(name, [CLUESmallAreaValue]);
+			minimapView.signal(name, [CLUESmallAreaValue]);
+			donutChartUsageDetail.view.signal(name, [CLUESmallAreaValue]);
+			donutChartUsage_Commercial.view.signal(name, [CLUESmallAreaValue]);
+			donutChartUsage_Dwelling.view.signal(name, [CLUESmallAreaValue]);
+			donutChartUsage_Other.view.signal(name, [CLUESmallAreaValue]);
+			donutChartUsage_Transportation.view.signal(name, [CLUESmallAreaValue]);
+			donutChartUsage_Unoccupied.view.signal(name, [CLUESmallAreaValue]);
+			BarChartTallest3.view.signal(name, [CLUESmallAreaValue]);
+			barChartNewBuildings.view.signal(name, [CLUESmallAreaValue]);
+			BarChartTallest2.view.signal(name, [CLUESmallAreaValue]);
+
+			mainView.signal("SelectedCLUEArea2", [CLUESmallAreaValue]);
+			subLocationTitle.innerHTML = " - " + String(CLUESmallAreaValue);
+			mainView.signal("isZoomedInSignal", true);
+
+			scatterPlotDoc.style.visibility = "hidden";
+			scatterPlot1_byBlockDoc.style.visibility = "";
+
+			let selectedCLUEArea = CLUESmallAreaValue;
+
+			let rotationLookup = {
+				"Parkville": [144.9515603312268, -37.78711656492933],
+				"Southbank": [144.9575, -37.82529018627908],
+				"South Yarra": [144.981, -37.8369],
+				"East Melbourne": [144.9795, -37.8148],
+				"Kensington": [144.918, -37.79],
+				"West Melbourne (Residential)": [144.948, -37.809],
+				"Melbourne (CBD)": [144.96291513859617, -37.81381109987871],
+				"Melbourne (Remainder)": [144.976, -37.833],
+				"North Melbourne": [144.94506274103145, -37.797],
+				"West Melbourne (Industrial)": [144.9221537804208, -37.809621301586795],
+				"Port Melbourne": [144.915, -37.833],
+				"Docklands": [144.937, -37.81851829412262],
+				"Carlton": [144.965, -37.7923],
+			};
+
+			let scaleLookup = {
+				"Parkville": 920000,
+				"Southbank": 1450000,
+				"South Yarra": 1500000,
+				"East Melbourne": 1600000,
+				"Kensington": 1100000,
+				"West Melbourne (Residential)": 2500000,
+				"Melbourne (CBD)": 1400000,
+				"Melbourne (Remainder)": 800000,
+				"North Melbourne": 1400000,
+				"West Melbourne (Industrial)": 900000,
+				"Port Melbourne": 800000,
+				"Docklands": 1050000,
+				"Carlton": 920000,
+			};
+
+			transformCurrent.lat = prevView.signal("LatRotationSignal");
+			transformCurrent.lon = prevView.signal("LonRotationSignal");
+			transformCurrent.zoom = prevView.signal("ScaleSignal");
+
+			transformTarget.lat = -rotationLookup[selectedCLUEArea][1];
+			transformTarget.lon = -rotationLookup[selectedCLUEArea][0];
+			transformTarget.zoom = scaleLookup[selectedCLUEArea];
+
+			setMapCursorEvents("none");
+			setAllZoomedMapsToFinalLocation(selectedCLUEArea);
+
+			isZoomedIn = true;
+
+			mainView.signal("LonRotationSignal", transformTarget.lon);
+			mainView.signal("LatRotationSignal", transformTarget.lat);
+			mainView.signal("ScaleSignal", transformTarget.zoom);
+
+			mainView.runAsync();
+
+			mainView.runAfter(
+				function(mainView) {
+					transTime = Date.now();
+
+					mainView.runAsync();
+					mainView.runAfter(recursiveAnimation);
+				}
+			);
+		};
+
+		let zoomCleanup = function() {
+			scatterPlot.view.runAsync();
+			scatterPlot1_byBlock.view.runAsync();
+			areaChart.view.runAsync();
+			minimapView.runAsync();
+			donutChartUsageDetail.view.runAsync();
+			donutChartUsage_Commercial.view.runAsync();
+			donutChartUsage_Dwelling.view.runAsync();
+			donutChartUsage_Other.view.runAsync();
+			donutChartUsage_Transportation.view.runAsync();
+			donutChartUsage_Unoccupied.view.runAsync();
+			BarChartTallest3.view.runAsync();
+			barChart.view.runAsync();
+			barChartNewBuildings.view.runAsync();
+			BarChartTallest2.view.runAsync();
+
+			updateAllMaps();
+		};
+
+		let SelectedCLUEAreaSignalListener = function(mainViewContainer, mainView, name, value) {
+			//For whatever reason, one map will return either null values, or values for invalid regions
+			if(activeMap == map_changeInAverageFloorCountContainer || (map_changeInAverageFloorCountContainer_zoomed == activeMap && !isZoomedIn)) {
+				let originState = mainView.signal(name);
+				let localSelectedCLUEArea = "";
+				if(originState.CLUESmallArea != undefined && originState.CLUESmallArea.length != 0) {
+					localSelectedCLUEArea = originState.CLUESmallArea[0];
+				}
+
+				if(
+					UsageChoice.value == "Transportation" && (
+						localSelectedCLUEArea == "South Yarra" ||
+						localSelectedCLUEArea == "Kensington" ||
+						localSelectedCLUEArea == "Melbourne (Remainder)" ||
+						localSelectedCLUEArea == "Port Melbourne"
+					) || UsageChoice.value == "Dwelling" && (
+						localSelectedCLUEArea == "West Melbourne (Industrial)" ||
+						localSelectedCLUEArea == "Port Melbourne"
+					)
+				) {
+					return;
+				}
+			}
+
+
+			let zoomedView = zoomedMap.view;
+			mainView.signal(name, value);
+
+			let originState = mainView.signal(name);
+
+			if(originState.CLUESmallArea === undefined) {
+				unZoomedMapElement.style.visibility = "hidden";
+				zoomedMapElement.style.visibility = "";
+				SelectedCLUEArea = "";
+				if(isZoomedIn) {
+					doZoomOut(mainViewContainer, mainView, zoomedView, name);
+				}
+			} else {
+				if(originState.CLUESmallArea.length != 0) {
+					unZoomedMapElement.style.visibility = "";
+					zoomedMapElement.style.visibility = "hidden";
+					SelectedCLUEArea = originState.CLUESmallArea[0];
+					doZoomIn(mainViewContainer, zoomedView, mainView, name, originState.CLUESmallArea[0]);
+				} else {
+					SelectedCLUEArea = "";
+				}
+			}
+			zoomCleanup();
+		};
+
+		window.addEventListener("unhandledrejection", function(event) {
+			let errorString = "Message : " + event.error + "<br>";
+
+			errorString += "Url : " + event.source + "<br>";
+
+			errorString += "Line number : " + event.lineno + "<br>";
+
+			errorString += "Column number : " + event.colno + "<br>";
+
+			console.log(errorString + "Error Object : " + event);
+		});
+
+		forceZoomOut = function() {
+			if(isZoomedIn) {
+				unZoomedMap.view.signal("SelectedCLUEArea", {});
+				SelectedCLUEArea = "";
+				unZoomedMap.view.run();
+				isZoomedIn = false;
+				unZoomedMapElement.style.visibility = "hidden";
+				zoomedMapElement.style.visibility = "";
+				doZoomOut(unZoomedMap, unZoomedMap.view, zoomedMap.view, "SelectedCLUEArea");
+
+				zoomCleanup();
+			}
+		};
+
+		ZoomOutButton.onclick = forceZoomOut;
+
+		vegaEmbed("#barChart1", "json/stackedBarChart.json", {"actions": false}).then(function(result) {
+			barChart = result;
+			let mainView = result.view;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+
+		let transformTarget = {
+			lat: 0, lon: 0, zoom: 0
+		};
+		let transformCurrent = {
+			lat: 0, lon: 0, zoom: 0
+		};
+		let transTime = 0;
+		let animationTime = 500;//Milliseconds
+
+		function delay(time) {
+			return new Promise(resolve => setTimeout(resolve, time));
+		}
+
+		let minimapView;
+		vegaEmbed("#minimap", "json/minimap.json", {"actions": false}).then(function(result) {
+			minimapView = result.view;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+
+		vegaEmbed("#map_default", "json/map_default.json", {"actions": false}).then(function(result) {
+			map_defaultContainer = result;
+
+			activeMap = result;
+			unZoomedMap = activeMap;
+			unZoomedMapElement = document.getElementById("map_default");
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#map_changeInAverageFloorCount", "json/map_changeInAverageFloorCount.json", {"actions": false}).then(function(result) {
+			map_changeInAverageFloorCountContainer = result;
+
+			let mainView = result.view;
+			let state = mainView.getState();
+			mainView.addSignalListener("SelectedCLUEArea", function(name, value) {SelectedCLUEAreaSignalListener(result, mainView, name, value);});
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#map_changeInAverageFloorCount_zoomed", "json/map_changeInAverageFloorCount_zoomed.json", {"actions": false}).then(function(result) {
+			map_changeInAverageFloorCountContainer_zoomed = result;
+			//Just needs to be set to one of the available maps
+			zoomedMap = result;
+			zoomedMapElement = document.getElementById("map_changeInAverageFloorCount_zoomed");
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#map_changeInTallest", "json/map_changeInTallest.json", {"actions": false}).then(function(result) {
+			map_changeInTallestContainer = result;
+			result.view.addSignalListener("SelectedCLUEArea", function(name, value) {SelectedCLUEAreaSignalListener(result, result.view, name, value);});
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#map_changeInTallest_zoomed", "json/map_changeInTallest_zoomed.json", {"actions": false}).then(function(result) {
+			map_changeInTallestContainer_zoomed = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#map_UsageOfTallest", "json/map_UsageOfTallest.json", {"actions": false}).then(function(result) {
+			map_UsageOfTallestContainer = result;
+			result.view.addSignalListener("SelectedCLUEArea", function(name, value) {SelectedCLUEAreaSignalListener(result, result.view, name, value);});
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#map_UsageOfTallest_zoomed", "json/map_UsageOfTallest_zoomed.json", {"actions": false}).then(function(result) {
+			map_UsageOfTallestContainer_zoomed = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+
+		vegaEmbed("#map_newBuildings", "json/map_newBuildings.json", {"actions": false}).then(function(result) {
+			map_newBuildingsContainer = result;
+			result.view.addSignalListener("SelectedCLUEArea", function(name, value) {SelectedCLUEAreaSignalListener(result, result.view, name, value);});
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#map_newBuildings_zoomed", "json/map_newBuildings_zoomed.json", {"actions": false}).then(function(result) {
+			map_newBuildingsContainer_zoomed = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+
+		vegaEmbed("#map_tallest", "json/map_tallest.json", {"actions": false}).then(function(result) {
+			map_tallestContainer = result;
+			result.view.addSignalListener("SelectedCLUEArea", function(name, value) {SelectedCLUEAreaSignalListener(result, result.view, name, value);});
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#map_tallest_zoomed", "json/map_tallest_zoomed.json", {"actions": false}).then(function(result) {
+			map_tallestContainer_zoomed = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+
+		vegaEmbed("#map_mostCommonUsage", "json/map_mostCommonUsage.json", {"actions": false}).then(function(result) {
+			map_mostCommonUsageContainer = result;
+			result.view.addSignalListener("SelectedCLUEArea", function(name, value) {SelectedCLUEAreaSignalListener(result, result.view, name, value);});
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#map_mostCommonUsage_zoomed", "json/map_mostCommonUsage_zoomed.json", {"actions": false}).then(function(result) {
+			map_mostCommonUsageContainer_zoomed = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+
+		vegaEmbed("#map_averageFloorCount", "json/map_averageFloorCount.json", {"actions": false}).then(function(result) {
+			map_averageFloorCountContainer = result;
+			result.view.addSignalListener("SelectedCLUEArea", function(name, value) {SelectedCLUEAreaSignalListener(result, result.view, name, value);});
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#map_averageFloorCount_zoomed", "json/map_averageFloorCount_zoomed.json", {"actions": false}).then(function(result) {
+			map_averageFloorCountContainer_zoomed = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+
+		vegaEmbed("#map_buildingCount", "json/map_buildingCount.json", {"actions": false}).then(function(result) {
+			map_buildingCountContainer = result;
+			result.view.addSignalListener("SelectedCLUEArea", function(name, value) {SelectedCLUEAreaSignalListener(result, result.view, name, value);});
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#map_buildingCount_zoomed", "json/map_buildingCount_zoomed.json", {"actions": false}).then(function(result) {
+			map_buildingCountContainer_zoomed = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+
+
+
+		var spec8 = "json/BarChartTallest2.json";
+		vegaEmbed("#BarChartTallest2", spec8, {"actions": false}).then(function(result) {
+			BarChartTallest2 = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		var spec9 = "json/BarChartTallest3.json";
+		vegaEmbed("#BarChartTallest3", spec9, {"actions": false}).then(function(result) {
+			BarChartTallest3 = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#barChartNewBuildings", "json/barChartNewBuildings.json", {"actions": false}).then(function(result) {
+			barChartNewBuildings = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		var spec11 = "json/AreaChart1.json";
+		vegaEmbed("#AreaChart1", spec11, {"actions": false}).then(function(result) {
+			areaChart = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		//TODO: Make function that loads a div and json with the same name, and adds the callback function to set usage and CLUEArea
+		vegaEmbed("#donutChartUsageDetail", "json/donutChartUsageDetail.json", {"actions": false}).then(function(result) {
+			donutChartUsageDetail = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		vegaEmbed("#donutChartUsage_Commercial", "json/donutChartUsage_Commercial.json", {"actions": false}).then(function(result) {
+			donutChartUsage_Commercial = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+		vegaEmbed("#donutChartUsage_Dwelling", "json/donutChartUsage_Dwelling.json", {"actions": false}).then(function(result) {
+			donutChartUsage_Dwelling = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+		vegaEmbed("#donutChartUsage_Other", "json/donutChartUsage_Other.json", {"actions": false}).then(function(result) {
+			donutChartUsage_Other = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+		vegaEmbed("#donutChartUsage_Transportation", "json/donutChartUsage_Transportation.json", {"actions": false}).then(function(result) {
+			donutChartUsage_Transportation = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+		vegaEmbed("#donutChartUsage_Unoccupied", "json/donutChartUsage_Unoccupied.json", {"actions": false}).then(function(result) {
+			donutChartUsage_Unoccupied = result;
+			chartsReadyCount += 1;
+			checkAllChartsReady();
+		}).catch(console.error);
+
+		let UsageChoice = document.getElementById("UsageChoice");
+		UsageChoice.addEventListener("change", (event) => {
+			let val = UsageChoice.value;
+
+			if(val == "Show All") {
+				map_changeInAverageFloorCountContainer_zoomed.view.signal("SelectedUsage", [""]);
+				map_UsageOfTallestContainer_zoomed.view.signal("SelectedUsage", [""]);
+				map_changeInTallestContainer_zoomed.view.signal("SelectedUsage", [""]);
+				map_newBuildingsContainer_zoomed.view.signal("SelectedUsage", [""]);
+				map_tallestContainer_zoomed.view.signal("SelectedUsage", [""]);
+				map_mostCommonUsageContainer_zoomed.view.signal("SelectedUsage", [""]);
+				map_averageFloorCountContainer_zoomed.view.signal("SelectedUsage", [""]);
+				map_buildingCountContainer_zoomed.view.signal("SelectedUsage", [""]);
+				map_changeInAverageFloorCountContainer.view.signal("SelectedUsage", [""]);
+				map_UsageOfTallestContainer.view.signal("SelectedUsage", [""]);
+				map_changeInTallestContainer.view.signal("SelectedUsage", [""]);
+				map_newBuildingsContainer.view.signal("SelectedUsage", [""]);
+				map_tallestContainer.view.signal("SelectedUsage", [""]);
+				map_mostCommonUsageContainer.view.signal("SelectedUsage", [""]);
+				map_averageFloorCountContainer.view.signal("SelectedUsage", [""]);
+				map_buildingCountContainer.view.signal("SelectedUsage", [""]);
+
+				donutChartUsageDetail.view.signal("SelectedUsage", "");
+
+				BarChartTallest2.view.signal("SelectedUsage", "");
+				scatterPlot.view.signal("SelectedUsage", "");
+				scatterPlot1_byBlock.view.signal("SelectedUsage", "");
+				barChart.view.signal("SelectedUsage", "");
+				areaChart.view.signal("SelectedUsage", "");
+				BarChartTallest3.view.signal("SelectedUsage", "");
+				barChartNewBuildings.view.signal("SelectedUsage", "");
+
+				document.getElementById("donutChartUsage_Commercial").style.visibility = "hidden";
+				document.getElementById("donutChartUsage_Dwelling").style.visibility = "hidden";
+				document.getElementById("donutChartUsage_Other").style.visibility = "hidden";
+				document.getElementById("donutChartUsage_Transportation").style.visibility = "hidden";
+				document.getElementById("donutChartUsage_Unoccupied").style.visibility = "hidden";
+				document.getElementById("donutChartUsageDetail").style.visibility = "";
+
+				donutChartUsageDetail.view.runAsync();
+			} else {
+				map_changeInAverageFloorCountContainer_zoomed.view.signal("SelectedUsage", [val]);
+				map_UsageOfTallestContainer_zoomed.view.signal("SelectedUsage", [val]);
+				map_changeInTallestContainer_zoomed.view.signal("SelectedUsage", [val]);
+				map_newBuildingsContainer_zoomed.view.signal("SelectedUsage", [val]);
+				map_tallestContainer_zoomed.view.signal("SelectedUsage", [val]);
+				map_mostCommonUsageContainer_zoomed.view.signal("SelectedUsage", [val]);
+				map_averageFloorCountContainer_zoomed.view.signal("SelectedUsage", [val]);
+				map_buildingCountContainer_zoomed.view.signal("SelectedUsage", [val]);
+				map_changeInAverageFloorCountContainer.view.signal("SelectedUsage", [val]);
+				map_UsageOfTallestContainer.view.signal("SelectedUsage", [val]);
+				map_changeInTallestContainer.view.signal("SelectedUsage", [val]);
+				map_newBuildingsContainer.view.signal("SelectedUsage", [val]);
+				map_tallestContainer.view.signal("SelectedUsage", [val]);
+				map_mostCommonUsageContainer.view.signal("SelectedUsage", [val]);
+				map_averageFloorCountContainer.view.signal("SelectedUsage", [val]);
+				map_buildingCountContainer.view.signal("SelectedUsage", [val]);
+
+
+				donutChartUsageDetail.view.signal("SelectedUsage", val);
+
+				BarChartTallest2.view.signal("SelectedUsage", val);
+				scatterPlot.view.signal("SelectedUsage", val);
+				scatterPlot1_byBlock.view.signal("SelectedUsage", val);
+				barChart.view.signal("SelectedUsage", val);
+				areaChart.view.signal("SelectedUsage", val);
+				BarChartTallest3.view.signal("SelectedUsage", val);
+				barChartNewBuildings.view.signal("SelectedUsage", val);
+
+				document.getElementById("donutChartUsage_Commercial").style.visibility = "hidden";
+				document.getElementById("donutChartUsage_Dwelling").style.visibility = "hidden";
+				document.getElementById("donutChartUsage_Other").style.visibility = "hidden";
+				document.getElementById("donutChartUsage_Transportation").style.visibility = "hidden";
+				document.getElementById("donutChartUsage_Unoccupied").style.visibility = "hidden";
+				document.getElementById("donutChartUsageDetail").style.visibility = "hidden";
+
+
+				if(val == "Commercial") {
+					donutChartUsage_Commercial.view.signal("SelectedUsage", val);
+					document.getElementById("donutChartUsage_Commercial").style.visibility = "";
+					donutChartUsage_Commercial.view.runAsync();
+				} else if(val == "Dwelling") {
+					donutChartUsage_Dwelling.view.signal("SelectedUsage", val);
+					document.getElementById("donutChartUsage_Dwelling").style.visibility = "";
+					donutChartUsage_Dwelling.view.runAsync();
+
+					if(zoomedMap != map_mostCommonUsageContainer_zoomed && (SelectedCLUEArea == "Port Melbourne" || SelectedCLUEArea == "West Melbourne (Industrial)")) {
+						forceZoomOut();
+					}
+				} else if(val == "Other") {
+					donutChartUsage_Other.view.signal("SelectedUsage", val);
+					document.getElementById("donutChartUsage_Other").style.visibility = "";
+					donutChartUsage_Other.view.runAsync();
+				} else if(val == "Transportation") {
+					donutChartUsage_Transportation.view.signal("SelectedUsage", val);
+					document.getElementById("donutChartUsage_Transportation").style.visibility = "";
+					donutChartUsage_Transportation.view.runAsync();
+
+					if(zoomedMap != map_mostCommonUsageContainer_zoomed) {
+						if(SelectedCLUEArea == "South Yarra") {
+							forceZoomOut();
+						}
+						if(zoomedMap == map_changeInAverageFloorCountContainer_zoomed) {
+							if(
+								SelectedCLUEArea == "South Yarra" ||
+								SelectedCLUEArea == "Kensington" ||
+								SelectedCLUEArea == "Melbourne (Remainder)" ||
+								SelectedCLUEArea == "Port Melbourne"
+							) {
+								forceZoomOut();
+							}
+						}
+					}
+				} else if(val == "Unoccupied") {
+					donutChartUsage_Unoccupied.view.signal("SelectedUsage", val);
+					document.getElementById("donutChartUsage_Unoccupied").style.visibility = "";
+					donutChartUsage_Unoccupied.view.runAsync();
+				}
+			}
+
+			BarChartTallest2.view.runAsync();
+			scatterPlot.view.runAsync();
+			scatterPlot1_byBlock.view.runAsync();
+			barChart.view.runAsync();
+			areaChart.view.runAsync();
+			BarChartTallest3.view.runAsync();
+			barChartNewBuildings.view.runAsync();
+
+			zoomedMap.view.runAsync();
+			unZoomedMap.view.runAsync();
+		});
+	</script>
+
+</body>
+
+</html>

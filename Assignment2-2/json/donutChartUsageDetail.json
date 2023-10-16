@@ -1,0 +1,137 @@
+{
+	"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	"description": "Donut chart of usages",
+	"width": 200,
+	"height": 150,
+	"data": {
+		"url": "cleaned6.csv",
+		"format": {
+			"type": "csv"
+		}
+	},
+	"config": {
+		"font": "VIC",
+		"style": {
+			"cell": {
+				"stroke": "transparent"
+			}
+		}
+	},
+	"params": [
+		{
+			"name": "SelectedUsage",
+			"value": ""
+		},
+		{
+			"name": "SelectedCLUEArea",
+			"value": [
+				""
+			]
+		}
+	],
+	"transform": [
+		{
+			"filter": "datum.BuildingCount2021 != 0"
+		},
+		{
+			"filter": "SelectedCLUEArea[0] == \"\" || indexof(SelectedCLUEArea, datum.CLUESmallArea) != -1"
+		},
+		{
+			"lookup": "Usage",
+			"from": {
+				"data": {
+					"url": "Space_usage_groupings.json"
+				},
+				"key": "name",
+				"fields": [
+					"type"
+				]
+			}
+		},
+		{
+			"filter": "SelectedUsage == \"\" || SelectedUsage == datum.type"
+		},
+		{
+			"aggregate": [
+				{
+					"op": "sum",
+					"field": "BuildingCount2021",
+					"as": "BuildingCount2021"
+				}
+			],
+			"groupby": [
+				"type"
+			]
+		},
+		{
+			"joinaggregate": [
+				{
+					"op": "sum",
+					"field": "BuildingCount2021",
+					"as": "TotalBuildingCount2021"
+				}
+			]
+		},
+		{
+			"calculate": "datum.BuildingCount2021/datum.TotalBuildingCount2021",
+			"as": "PercentOfTotal"
+		}
+	],
+	"layer": [
+		{
+			"mark": {
+				"type": "arc",
+				"innerRadius": 50,
+				"outerRadius": 80
+			}
+		}
+	],
+	"encoding": {
+		"theta": {
+			"field": "PercentOfTotal",
+			"type": "quantitative"
+		},
+		"color": {
+			"condition": {
+				"test": "SelectedUsage != \"\" && SelectedUsage != datum.type",
+				"value": "#999"
+			},
+			"field": "type",
+			"scale": {
+				"domain": [
+					"Commercial",
+					"Dwelling",
+					"Other",
+					"Transportation",
+					"Unoccupied"
+				],
+				"range": [
+					"#56b4e9",
+					"#009e73",
+					"#ebc121",
+					"#0072b2",
+					"#cc79a7"
+				]
+			},
+			"title": "Usage"
+		},
+		"tooltip": [
+			{
+				"field": "type",
+				"type": "nominal",
+				"title": "Usage"
+			},
+			{
+				"field": "PercentOfTotal",
+				"type": "quantitative",
+				"format": ".2%",
+				"title": "Building percentage"
+			},
+			{
+				"field": "BuildingCount2021",
+				"type": "quantitative",
+				"title": "Building Count"
+			}
+		]
+	}
+}
